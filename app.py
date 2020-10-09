@@ -1,138 +1,46 @@
-from flask import *
-import sqlite3, hashlib, os
-from werkzeug.utils import secure_filename
-from forms import ItemSearchForm
+from flask import Flask, render_template, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+import models
+import forms
 
 app = Flask(__name__)
-app.secret_key = 'random string'
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = set(['jpeg', 'jpg', 'png', 'gif'])
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = 's3cr3t'
+app.config.from_object('config')
+db = SQLAlchemy(app, session_options={'autocommit': False})
 
-# all of the following method are required to be implemented
-# there will be some function not included but required to be done
-# follow the project description for detail
+@app.route('/')
+def all_drinkers():
+    drinkers = db.session.query(models.Drinker).all()
+    return render_template('all-drinkers.html', drinkers=drinkers)
 
-# my implementation is based on sqlite3, you are free to change it to sqlAlchemy
+@app.route('/drinker/<name>')
+def drinker(name):
+    drinker = db.session.query(models.Drinker)\
+        .filter(models.Drinker.name == name).one()
+    return render_template('drinker.html', drinker=drinker)
 
-
-def getLoginDetails():
-    with sqlite3.connect('database.db') as conn:
-        pass
-        #
-    conn.close()
-    return (loggedIn, firstName, noOfItems)
-
-@app.route('/', methods=['GET', 'POST'])
-def root():
-    placetaker = ''
-    return render_template('home.html', placetaker =placetaker)
-
-@app.route('/results', methods=['GET', 'POST'])
-def search_results(search):
-    placetaker = ''
-    return render_template('result.html', placetaker =placetaker)
-
-@app.route("/add")
-def admin():
-    placetaker = ''
-    return render_template('add.html', placetaker =placetaker)
-
-@app.route("/addItem", methods=["GET", "POST"])
-def addItem():
-    print(msg)
-    return redirect(url_for('root'))
-
-@app.route("/remove")
-def remove():
-    data = ''
-    return render_template('remove.html', data=data)
-
-@app.route("/removeItem")
-def removeItem():
-    print(msg)
-    return redirect(url_for('root'))
-
-@app.route("/displayCategory")
-def displayCategory():
-    placetaker = ''
-    return render_template('displayCategory.html', placetaker =placetaker)
-
-@app.route("/account/profile")
-def profileHome():
-    placetaker = ''
-    return render_template("profileHome.html", placetaker =placetaker)
-
-@app.route("/account/profile/edit")
-def editProfile():
-    placetaker = ''
-    return render_template("editProfile.html", placetaker =placetaker)
-
-@app.route("/account/profile/changePassword", methods=["GET", "POST"])
-def changePassword():
-    placetaker = ''
-    return render_template("changePassword.html", placetaker =placetaker)
-
-@app.route("/updateProfile", methods=["GET", "POST"])
-def updateProfile():
-    return redirect(url_for('editProfile'))
-
-@app.route("/loginForm")
-def loginForm():
-    return render_template('login.html', error='')
-
-@app.route("/login", methods = ['POST', 'GET'])
-def login():
-    if True:
-
-        return redirect(url_for('root'))
+@app.route('/edit-drinker/<name>', methods=['GET', 'POST'])
+def edit_drinker(name):
+    drinker = db.session.query(models.Drinker)\
+        .filter(models.Drinker.name == name).one()
+    beers = db.session.query(models.Beer).all()
+    bars = db.session.query(models.Bar).all()
+    form = forms.DrinkerEditFormFactory.form(drinker, beers, bars)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.Drinker.edit(name, form.name.data, form.address.data,
+                                form.get_beers_liked(), form.get_bars_frequented())
+            return redirect(url_for('drinker', name=form.name.data))
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('edit-drinker.html', drinker=drinker, form=form)
     else:
-        error = 'Invalid UserId / Password'
-        return render_template('login.html', error=error)
+        return render_template('edit-drinker.html', drinker=drinker, form=form)
 
-@app.route("/productDescription", methods=['GET', 'POST'])
-def productDescription():
-    placetaker = ''
-    return render_template("productDescription.html", placetaker =placetaker)
-
-@app.route("/addToCart")
-def addToCart():
-    print('')
-    return redirect(url_for('root'))
-
-@app.route("/cart", methods=['GET', 'POST'])
-def cart():
-    placetaker = ''
-    return render_template("cart.html", placetaker =placetaker)
-
-@app.route("/removeFromCart")
-def removeFromCart():
-
-    return redirect(url_for('root'))
-
-@app.route("/logout")
-def logout():
-
-    return redirect(url_for('root'))
-
-def is_valid(email, password):
-    if True:
-        return True
-    return False
-
-@app.route("/register", methods = ['GET', 'POST'])
-def register():
-    msg = ''
-    return render_template("login.html", error=msg)
-
-@app.route("/registerationForm")
-def registrationForm():
-    return render_template("register.html")
-
-
-def parse(data):
-    ans = []
-    return ans
+@app.template_filter('pluralize')
+def pluralize(number, singular='', plural='s'):
+    return singular if number in (0, 1) else plural
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

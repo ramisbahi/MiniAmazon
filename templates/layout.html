@@ -1,0 +1,17 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Flask DB-Beers Example</title>
+    <meta name="description" content="A sample Flask website for db-beers"/>
+    <meta name="keywords" content="flask, db-beers"/>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
+    <link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen"/>
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+  </head>
+  <body>
+    <h1><img src="/static/img/beer.jpg" style="float:right"/> Flask <a href="/">DB-Beers Example</a></h1>
+    <hr/>
+    <h2 id="heading">{% block heading %}{% endblock %}</h2>
+    {% block content %}{% endblock %}
+  </body>
+</html>
