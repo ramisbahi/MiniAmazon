@@ -1,0 +1,7 @@
+{% extends 'miniamazon_layout.html' %}
+{% block heading %}Item Information: {{item.item_name}}{% endblock %}
+{% block content %}
+<p>Name: {{item.item_name}}</p>
+<p>Product_id: {{item.product_id}}</p>
+<p>Seller: {{item.seller_username}}</p>
+{% endblock %}

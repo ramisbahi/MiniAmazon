@@ -30,6 +30,13 @@ class Drinker(db.Model):
             db.session.rollback()
             raise e
 
+class Item(db.Model):
+    __tablename__ = 'item'
+    product_id = db.Column('product_id', db.Integer, primary_key=True)
+    seller_username = db.Column('seller_username', db.String(20))
+    item_name = db.Column('item_name', db.String(20))
+
+
 class Beer(db.Model):
     __tablename__ = 'beer'
     name = db.Column('name', db.String(20), primary_key=True)

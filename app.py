@@ -13,6 +13,12 @@ def all_drinkers():
     drinkers = db.session.query(models.Drinker).all()
     return render_template('all-drinkers.html', drinkers=drinkers)
 
+@app.route('/item/<product_id>')
+def item(product_id):
+    item = db.session.query(models.Item)\
+        .filter(models.Item.product_id == product_id).one()
+    return render_template('item.html', item=item)
+
 @app.route('/drinker/<name>')
 def drinker(name):
     drinker = db.session.query(models.Drinker)\
