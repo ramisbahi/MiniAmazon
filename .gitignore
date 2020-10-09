@@ -1,0 +1,8 @@
+# Prevents these files/folders from being pushed to GitHub
+
+env/
+venv/
+
+.idea
+
+__pycache__
