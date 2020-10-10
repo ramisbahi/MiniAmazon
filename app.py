@@ -9,9 +9,9 @@ app.config.from_object('config')
 db = SQLAlchemy(app, session_options={'autocommit': False})
 
 @app.route('/')
-def all_drinkers():
-    drinkers = db.session.query(models.Drinker).all()
-    return render_template('all-drinkers.html', drinkers=drinkers)
+def all_items():
+    items = db.session.query(models.Item).all()
+    return render_template('all-items.html', items=items)
 
 @app.route('/item/<product_id>')
 def item(product_id):
@@ -43,10 +43,11 @@ def review(product_id):
             form.errors['database'] = str(e)
 
     avg_rating = 0
-    for review in reviews:
-        avg_rating += review.rating
-    avg_rating /= len(reviews)
-    avg_rating = round(avg_rating, 2)
+    if len(reviews):
+        for review in reviews:
+            avg_rating += review.rating
+        avg_rating /= len(reviews)
+        avg_rating = round(avg_rating, 2)
 
     return render_template('reviews.html', item=item, reviews=reviews, avg_rating=avg_rating, form=form)
 
