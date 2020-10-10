@@ -1,4 +1,4 @@
-from sqlalchemy import sql, orm
+from sqlalchemy import sql, orm, CheckConstraint
 from app import db
 
 class Drinker(db.Model):
@@ -35,6 +35,14 @@ class Item(db.Model):
     product_id = db.Column('product_id', db.Integer, primary_key=True)
     seller_username = db.Column('seller_username', db.String(20))
     item_name = db.Column('item_name', db.String(20))
+
+
+class Review(db.Model):
+    __tablename__ = 'review'
+    id = db.Column('id', db.Integer, autoincrement=True, primary_key=True)
+    rating = db.Column('rating', db.Integer, CheckConstraint('rating >= 1 AND rating <= 5'))
+    comment = db.Column('comment', db.Text)
+    item_id = db.Column('item_id', db.Integer, db.ForeignKey('item.product_id'))
 
 
 class Beer(db.Model):
@@ -76,3 +84,5 @@ class Frequents(db.Model):
                     db.ForeignKey('bar.name'),
                     primary_key=True)
     times_a_week = db.Column('times_a_week', db.Integer())
+
+db.create_all()
