@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+{% block heading %}All Reviews for {{item.item_name}}{% endblock %}
+{% block content %}
+    <ul>
+        {% for review in reviews %}
+            <li>{{review.rating}} stars</li>
+            <li>Comment: {{review.comment}}</li>
+            <br />
+        {% endfor %}
+    </ul>
+    <hr/>
+    <p>{{reviews|length}} review{{reviews|length|pluralize}}
+        found in the database for an average rating of {{avg_rating}}.</p>
+
+    <h4>Add rating: </h4>
+    <form action="{{url_for('review', product_id=item.product_id)}}" method="POST">
+        {{form.csrf_token}}
+        <p>
+            Rating: {{form.rating}}
+            {% if form.rating.errors %}
+                <ul>{% for error in form.rating.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            Comment: {{form.comment}}
+            {% if form.comment.errors %}
+                <ul>{% for error in form.comment.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <hr/>
+        <input type="reset" value="Reset"/>
+        <input type="submit" value="Submit"/>
+        {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+    </form>
+
+{% endblock %}
