@@ -40,3 +40,12 @@ class DrinkerEditFormFactory:
             default = bars_frequented[bar.name] if bar.name in bars_frequented else 0
             setattr(F, field_name, IntegerField(default=default))
         return F()
+
+
+class ReviewFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            rating = IntegerField(default=5)
+            comment = StringField(default='')
+        return F()
