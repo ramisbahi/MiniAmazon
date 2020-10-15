@@ -97,5 +97,3 @@ class Frequents(db.Model):
                     db.ForeignKey('bar.name'),
                     primary_key=True)
     times_a_week = db.Column('times_a_week', db.Integer())
-
-db.create_all()
