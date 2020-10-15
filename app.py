@@ -12,7 +12,6 @@ db = SQLAlchemy(app, session_options={'autocommit': False})
 buyer = 'joshguo'
 
 @app.route('/')
-<<<<<<< HEAD
 def home():
     items = db.session.query(models.Items).all()
     return render_template('all-items.html', items=items)
@@ -21,11 +20,6 @@ def home():
 #def all_drinkers():
 #    drinkers = db.session.query(models.Drinker).all()
 #    return render_template('all-drinkers.html', drinkers=drinkers)
-=======
-def all_items():
-    items = db.session.query(models.Item).all()
-    return render_template('all-items.html', items=items)
->>>>>>> 22a9e2888fea9fda076361e0e46184cd24688b61
 
 @app.route('/item/<product_id>')
 def item(product_id):
