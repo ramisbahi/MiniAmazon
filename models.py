@@ -30,11 +30,24 @@ class Drinker(db.Model):
             db.session.rollback()
             raise e
 
-class Item(db.Model):
-    __tablename__ = 'item'
-    product_id = db.Column('product_id', db.Integer, primary_key=True)
-    seller_username = db.Column('seller_username', db.String(20))
-    item_name = db.Column('item_name', db.String(20))
+class Items(db.Model):
+    __tablename__ = 'items'
+    product_id = db.Column('product_id', db.Integer(), primary_key=True)
+    seller_username = db.Column('seller_username', db.String(30), primary_key=True)
+    category = db.Column('category', db.String(80))
+    condition = db.Column('condition', db.String(30))
+    item_name = db.Column('item_name', db.String(80))
+    price = db.Column('price', db.Float())
+    quantity = db.Column('quantity', db.Integer())
+    image = db.Column('image', db.String(500))
+    description = db.Column('description', db.String(2000))
+
+class inwishlist(db.Model):
+    __tablename__ = 'inwishlist'
+    product_id = db.Column('product_id', db.Integer(), primary_key = True)
+    seller_username = db.Column('seller_username', db.String(30), primary_key = True)
+    buyer_username = db.Column('buyer_username', db.String(30), primary_key = True)
+    wishlist_quantity = db.Column('wishlist_quantity', db.Integer())
 
 
 class Beer(db.Model):

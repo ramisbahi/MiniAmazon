@@ -1,7 +1,14 @@
-{% extends 'miniamazon_layout.html' %}
-{% block heading %}Item Information: {{item.item_name}}{% endblock %}
+{% extends 'layout.html' %}
+{% block heading %}{% endblock %}
 {% block content %}
+<h1><a href="/cart/{{buyer}}">View Cart</a> | <a href="/wishlist/{{buyer}}">View Wishlist</a></h1>
+<h2>Item Information: {{item.item_name}}</h2>
+
+<img src={{item.image}}>
+<p>Add to Cart | <a href="/add_wishlist/product_id={{item.product_id}}&seller_username={{item.seller_username}}&buyer_username={{buyer}}">Add to Wishlist</a></p>
 <p>Name: {{item.item_name}}</p>
-<p>Product_id: {{item.product_id}}</p>
+<p>Price: {{item.price}}</p>
 <p>Seller: {{item.seller_username}}</p>
+<p>Category: {{item.category}}</p>
+<p>Condition: {{item.condition}}</p>
 {% endblock %}

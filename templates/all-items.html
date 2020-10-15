@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block heading %}All Items{% endblock %}
+{% block content %}
+<ul>
+  {% for item in items %}
+  <li><a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a></li>
+  {% endfor %}
+</ul>
+<hr/>
+<p>{{items|length}} item{{items|length|pluralize}}
+  found in the database.</p>
+{% endblock %}
