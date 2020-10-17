@@ -2,8 +2,9 @@
 {% block heading %}Wishlist{% endblock %}
 {% block content %}
 <ul>
-  {% for i in range(0, len)%}
+  {% for i in range(0, items|length)%}
   <li><a href="{{url_for('item', product_id=items[i].product_id)}}">{{items[i].item_name}}</a> sold by {{items[i].seller_username}} - Quantity: {{wishlist_items[i].wishlist_quantity}}
+   - PRICE: ${{'%0.2f' % items[i].price}}
     <a href="{{url_for('subtract_quantity_wishlist', product_id=items[i].product_id, seller_username=items[i].seller_username, buyer_username=username)}}">
       <button type="button">-</button>
     </a>
@@ -17,6 +18,5 @@
   {% endfor %}
 </ul>
 <hr/>
-<p>{{items|length}} item{{items|length|pluralize}}
-  in wishlist.</p>
+<p>Subtotal ({{total_quantity}} item{{total_quantity|pluralize}}): ${{total_price}}</p>
 {% endblock %}

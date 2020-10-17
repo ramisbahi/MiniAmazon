@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import models
 import forms
 import sys
+from numpy import dot
 
 app = Flask(__name__)
 app.secret_key = 's3cr3t'
@@ -73,7 +74,14 @@ def wishlist(username):
 
     for wishlist_item in wishlist_items:
         items.append(db.session.query(models.Items).filter(models.Items.product_id == wishlist_item.product_id).filter(models.Items.seller_username == wishlist_item.seller_username).one())
-    return render_template('wishlist.html', len = len(items), wishlist_items=wishlist_items, items=items, username=username)
+
+    item_prices = [item.price for item in items]
+    wishlist_quantities = [wishlist_item.wishlist_quantity for wishlist_item in wishlist_items]
+    total_price = dot(item_prices, wishlist_quantities)
+    total_quantity = 0
+    for quantity in wishlist_quantities:
+        total_quantity += quantity
+    return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=username, total_price=total_price, total_quantity=total_quantity)
 
 
 
