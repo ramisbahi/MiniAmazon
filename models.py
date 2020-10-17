@@ -1,9 +1,7 @@
 from sqlalchemy import sql, orm, CheckConstraint, ForeignKeyConstraint
-from app import dbfrom sqlalchemy import sql, orm, CheckConstraint
 from app import db
-
-
-
+from sqlalchemy import sql, orm, CheckConstraint
+from app import db
 
 class Drinker(db.Model):
     __tablename__ = 'drinker'
