@@ -49,6 +49,37 @@ class inwishlist(db.Model):
     buyer_username = db.Column('buyer_username', db.String(30), primary_key = True)
     wishlist_quantity = db.Column('wishlist_quantity', db.Integer())
 
+class inorder(db.Model):
+    __tablename__ = 'inorder'
+    product_id = db.Column('product_id', db.Integer(), primary_key = True)
+    seller_username = db.Column('seller_username', db.String(30), primary_key=True)
+    order_id = db.Column('order_id', db.Integer(), primary_key = True)
+    order_quantity = db.Column('order_quantity', db.Integer())
+
+class incart(db.Model):
+    __tablename__ = 'incart'
+    product_id = db.Column('product_id', db.Integer(), primary_key = True)
+    seller_username = db.Column('seller_username', db.String(30), primary_key = True)
+    buyer_username = db.Column('buyer_username', db.String(30), primary_key = True)
+    cart_quantity = db.Column('cart_quantity', db.Integer())
+
+class Buyers(db.Model):
+    __tablename__ = 'buyers'
+    username = db.Column('username', db.String(30), primary_key = True)
+    is_seller = db.Column('is_seller', db.Boolean())
+    bio = db.Column('bio', db.String(200))
+    name = db.Column('name', db.String(30))
+    password = db.Column('password', db.String(30))
+    address = db.Column('address', db.String(200))
+
+class Orders(db.Model):
+    __tablename__ = 'orders'
+    order_id = db.Column('order_id', db.Integer(), primary_key = True)
+    buyer_username = db.Column('buyer_username', db.String(30))
+    tracking_num = db.Column('tracking_num', db.Integer())
+    date_returned = db.Column('date_returned', db.Date())
+    date_ordered = db.Column('date_ordered', db.Date())
+    shipping_status = db.Column('shipping_status', db.String(30))
 
 class Review(db.Model):
     __tablename__ = 'review'
