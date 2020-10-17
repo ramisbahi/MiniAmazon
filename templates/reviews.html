@@ -3,8 +3,8 @@
 {% block content %}
     <ul>
         {% for review in reviews %}
-            <li>{{review.rating}} stars</li>
-            <li>Comment: {{review.comment}}</li>
+            <li>{{review.item_rating}} stars</li>
+            <li>Comment: {{review.comments}}</li>
             <br />
         {% endfor %}
     </ul>
@@ -16,15 +16,15 @@
     <form action="{{url_for('review', product_id=item.product_id)}}" method="POST">
         {{form.csrf_token}}
         <p>
-            Rating: {{form.rating}}
-            {% if form.rating.errors %}
-                <ul>{% for error in form.rating.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            Rating: {{form.item_rating}}
+            {% if form.item_rating.errors %}
+                <ul>{% for error in form.item_rating.errors %}<li>{{error}}</li>{% endfor %}</ul>
             {% endif %}
         </p>
         <p>
-            Comment: {{form.comment}}
-            {% if form.comment.errors %}
-                <ul>{% for error in form.comment.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            Comment: {{form.comments}}
+            {% if form.comments.errors %}
+                <ul>{% for error in form.comments.errors %}<li>{{error}}</li>{% endfor %}</ul>
             {% endif %}
         </p>
         <hr/>
@@ -32,5 +32,6 @@
         <input type="submit" value="Submit"/>
         {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
     </form>
+    {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
 
 {% endblock %}

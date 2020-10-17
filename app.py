@@ -79,20 +79,26 @@ def wishlist(username):
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
-    item = db.session.query(models.Item) \
-        .filter(models.Item.product_id == product_id).one()
+    item = db.session.query(models.Items) \
+        .filter(models.Items.product_id == product_id).one()
 
-    reviews = db.session.query(models.Review) \
-        .filter(models.Review.item_id == product_id) \
-        .group_by(models.Review.id).all()
+    reviews = db.session.query(models.Reviews) \
+        .filter(models.Reviews.product_id == product_id) \
+        .group_by(models.Reviews.review_id).all()
+
 
     form = forms.ReviewFormFactory.form()
     if form.validate_on_submit():
         try:
-            new_review = models.Review()
-            new_review.rating = form.rating.data
-            new_review.comment = form.comment.data
-            new_review.item_id = product_id
+            new_review = models.Reviews()
+            new_review.item_rating = form.item_rating.data
+            new_review.comments = form.comments.data
+            new_review.product_id = product_id
+            new_review.seller_username = item.seller_username
+            # TODO: change once buyer functionality exists
+            new_review.buyer_username = 'joshguo'
+            print(new_review)
+
             db.session.add(new_review)
             db.session.commit()
 
@@ -103,7 +109,7 @@ def review(product_id):
     avg_rating = 0
     if len(reviews):
         for review in reviews:
-            avg_rating += review.rating
+            avg_rating += review.item_rating
         avg_rating /= len(reviews)
         avg_rating = round(avg_rating, 2)
 

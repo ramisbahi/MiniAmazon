@@ -46,6 +46,6 @@ class ReviewFormFactory:
     @staticmethod
     def form():
         class F(FlaskForm):
-            rating = IntegerField(default=5)
-            comment = StringField(default='')
+            item_rating = IntegerField(default=5)
+            comments = StringField(default='')
         return F()
