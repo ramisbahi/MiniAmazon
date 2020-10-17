@@ -1,4 +1,4 @@
-CREATE TABLE Reviews(review_id INTEGER NOT NULL PRIMARY KEY,
+CREATE TABLE Reviews(review_id SERIAL PRIMARY KEY,
                      product_id INTEGER NOT NULL,
                      seller_username VARCHAR(30) NOT NULL,
                      buyer_username VARCHAR(30) NOT NULL REFERENCES Buyers(username),
