@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+{% block heading %}Edit Buyer Information: {{buyer.username}}{% endblock %}
+{% block content %}
+<form action="{{url_for('edit_buyer', username=buyer.username)}}" method="POST">
+    {{form.csrf_token}}
+    <p>
+        Username: {{form.username}}
+        {% if form.username.errors %}
+    <ul>{% for error in form.username.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+    </p>
+    <p>
+        Bio: {{form.bio}}
+        {% if form.bio.errors %}
+    <ul>{% for error in form.bio.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+    </p>
+    <p>
+        Name: {{form.name}}
+        {% if form.name.errors %}
+    <ul>{% for error in form.name.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+    </p>
+    <p>
+        Address: {{form.address}}
+        {% if form.address.errors %}
+    <ul>{% for error in form.address.errors %}<li>{{error}}</li>{% endfor %}</ul>
+    {% endif %}
+    </p>
+    <hr/>
+    <input type="reset" value="Reset"/>
+    <input type="submit" value="Submit"/>
+    {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+</form>
+{% endblock %}

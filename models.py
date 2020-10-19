@@ -95,6 +95,15 @@ class Buyers(db.Model):
     name = db.Column('name', db.String)
     password = db.Column('password', db.String)
     address = db.Column('address', db.String)
+    def edit(old_username, username, bio, name, address):
+            try:
+                db.session.execute('UPDATE buyer SET username = :username, bio = :bio, name = :name, address = :address'
+                                   ' WHERE username = :old_username',
+                                   dict(old_username=old_username, username=username, bio=bio, name=name, address=address))
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                raise e
 
 class Beer(db.Model):
     __tablename__ = 'beer'
