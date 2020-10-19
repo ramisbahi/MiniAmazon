@@ -41,6 +41,15 @@ class DrinkerEditFormFactory:
             setattr(F, field_name, IntegerField(default=default))
         return F()
 
+class BuyerEditFormFactory:
+    @staticmethod
+    def form(buyer):
+        class F(FlaskForm):
+            username = StringField(default=buyer.username)
+            name = StringField(default=buyer.name)
+            address = StringField(default=buyer.address)
+            bio = StringField(default=buyer.bio)
+        return F()
 
 class ReviewFormFactory:
     @staticmethod

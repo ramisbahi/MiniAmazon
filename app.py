@@ -115,6 +115,29 @@ def review(product_id):
 
     return render_template('reviews.html', item=item, reviews=reviews, avg_rating=avg_rating, form=form)
 
+# buyer profiles, based on drinker profiles
+@app.route('/buyer/<username>')
+def buyer(username):
+    buyer = db.session.query(models.Buyers)\
+        .filter(models.Buyers.username == username).one()
+    return render_template('buyer.html', buyer=buyer)
+
+@app.route('/edit-buyer/<username>', methods=['GET', 'POST'])
+def edit_buyer(username):
+    buyer = db.session.query(models.Buyers)\
+        .filter(models.Buyers.username == username).one()
+    form = forms.BuyerEditFormFactory.form(buyer)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.Buyers.edit(username, form.username.data, form.bio.data, form.name.data,
+                                form.address.data)
+            return redirect(url_for('buyer', username=form.username.data))
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('edit-buyer.html', buyer=buyer, form=form)
+    else:
+        return render_template('edit-buyer.html', buyer=buyer, form=form)
 
 @app.route('/drinker/<name>')
 def drinker(name):
