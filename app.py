@@ -68,6 +68,7 @@ def delete_wishlist(product_id, seller_username, buyer_username):
 # returns wishlist for user
 @app.route('/wishlist/<username>')
 def wishlist(username):
+    username='joshguo'
     wishlist_items = db.session.query(models.inwishlist)\
         .filter(models.inwishlist.buyer_username == username).all()
     items = []
