@@ -26,6 +26,7 @@ def home():
 def item(product_id):
     item = db.session.query(models.Items)\
         .filter(models.Items.product_id == product_id).one()
+    buyer = 'joshguo'
     return render_template('item.html', item=item, buyer=buyer)
 
 # adds item to wishlist
