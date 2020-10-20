@@ -16,6 +16,8 @@ CREATE TABLE Buyers(username VARCHAR(30) NOT NULL PRIMARY KEY,
 INSERT INTO Buyers VALUES('ramisbahi', TRUE, 'I am cool', 'Rami Sbahi', 'superman', '3200 Jam Court\nDurham, NC 27708\nUnited States');
 INSERT INTO Buyers VALUES('chrisyang', TRUE, 'I am not very cool', 'Chris Yang', 'spiderman', '3000 Yang Court\nDurham, NC 27708\nUnited States');
 INSERT INTO Buyers VALUES('joshguo', FALSE, 'I am the man the myth the legend', 'Josh Guo', 'IRONMAN', '1200 Yeet Drive\nDurham, NC 27708\nUnited States');
+INSERT INTO Buyers VALUES('DonaldTrump', FALSE, 'I am the president', 'DJT', 'Swampman', 'White House');
+
 
 CREATE TABLE Orders(order_id INTEGER NOT NULL PRIMARY KEY,
                     buyer_username VARCHAR(30) NOT NULL REFERENCES Buyers(username),

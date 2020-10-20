@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% block heading %}Seller Information: {{seller.username}}{% endblock %}
+{% block content %}
+<p>Name: {{seller.name}}</p>
+<p>Address: {{seller.address}}</p>
+<p>Bio: {{seller.bio}}</p>
+<h2>
+    Items Selling:
+</h2>
+<ul>
+    {% for i in range(0, items|length)%}
+    <li><a href="{{url_for('item', product_id=items[i].product_id)}}">{{items[i].item_name}}</a> - PRICE: ${{'%0.2f' % items[i].price}}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

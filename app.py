@@ -148,6 +148,16 @@ def edit_buyer(username):
     else:
         return render_template('edit-buyer.html', buyer=buyer, form=form)
 
+# seller profiles, based on drinker profiles
+@app.route('/seller/<username>')
+def seller(username):
+    seller = db.session.query(models.Buyers)\
+        .filter(models.Buyers.username == username).filter(models.Buyers.is_seller).one()
+    seller_items = db.session.query(models.Items)\
+        .filter(models.Items.seller_username == username).all()
+    return render_template('seller.html', seller=seller, items=seller_items)
+
+
 @app.route('/drinker/<name>')
 def drinker(name):
     drinker = db.session.query(models.Drinker)\
