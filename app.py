@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import models
 import forms
@@ -15,6 +15,11 @@ buyer = 'joshguo'
 @app.route('/')
 def home():
     items = db.session.query(models.Items).all()
+    username='joshguo'
+    cart = db.session.query(models.incart)\
+        .filter(models.incart.buyer_username == username).all()
+    if (cart is None):
+        flash('Cart is empty!')
     return render_template('all-items.html', items=items)
 
 
@@ -85,7 +90,69 @@ def wishlist(username):
         total_quantity += quantity
     return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=username, total_price=total_price, total_quantity=total_quantity)
 
+# adds item to cart
+@app.route('/add_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
+def add_cart(product_id, seller_username, buyer_username):
+    currItem = db.session.query(models.incart).filter(models.incart.product_id == product_id).filter(models.incart.seller_username == models.incart.seller_username).filter(models.incart.buyer_username == models.incart.buyer_username).all() # going to subtract quantity from this item
+    if currItem:
+        return redirect(url_for('add_quantity_cart', product_id=product_id, seller_username=seller_username, buyer_username=buyer_username)) # increase quantity by 1 if already in wish list
+    else: # not in cart already
+        db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+        db.session.commit()
+        return redirect(url_for('cart', username=buyer_username), code=307)
 
+# decreases quantity by 1 for item in cart
+@app.route('/subtract_quantity_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
+def subtract_quantity_cart(product_id, seller_username, buyer_username):
+    currItem = db.session.query(models.incart).filter(models.incart.product_id == product_id).filter(models.incart.seller_username == models.incart.seller_username).filter(models.incart.buyer_username == models.incart.buyer_username).one() # going to subtract quantity from this item
+    currQuantity = currItem.cart_quantity
+    if currQuantity >= 2:
+        db.session.execute('UPDATE incart SET cart_quantity = cart_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+        db.session.commit()
+        return redirect(url_for('cart', username=buyer_username), code=307)
+    else: # delete item if only 1
+        return redirect(url_for('delete_cart', product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+
+# increases quantity by 1 for item in cart
+@app.route('/add_quantity_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
+def add_quantity_cart(product_id, seller_username, buyer_username):
+    db.session.execute('UPDATE incart SET cart_quantity = cart_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+    db.session.commit()
+    return redirect(url_for('cart', username=buyer_username), code=307)
+
+# deletes item from cart
+@app.route('/delete_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
+def delete_cart(product_id, seller_username, buyer_username):
+    db.session.execute('DELETE FROM incart WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+    db.session.commit()
+    return redirect(url_for('cart', username=buyer_username), code=307)
+
+# returns cart for user
+@app.route('/cart/<username>')
+def cart(username):
+    username='joshguo'
+    cart_items = db.session.query(models.incart)\
+        .filter(models.incart.buyer_username == username).all()
+    items = []
+
+    for cart_item in cart_items:
+        items.append(db.session.query(models.Items).filter(models.Items.product_id == cart_item.product_id).filter(models.Items.seller_username == cart_item.seller_username).one())
+
+    item_prices = [item.price for item in items]
+    cart_quantities = [cart_item.cart_quantity for cart_item in cart_items]
+    total_price = dot(item_prices, cart_quantities)
+    total_quantity = 0
+    for quantity in cart_quantities:
+        total_quantity += quantity
+    return render_template('cart.html', cart_items=cart_items, items=items, username=username, total_price=total_price, total_quantity=total_quantity)
+
+# deletes item from cart
+@app.route('/transaction_success')
+def transaction_success():
+    items = db.session.query(models.Items).all()
+    db.session.execute('DELETE FROM incart')
+    db.session.commit()
+    return render_template('all-items.html', items=items)
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
