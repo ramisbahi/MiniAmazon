@@ -12,7 +12,7 @@ db = SQLAlchemy(app, session_options={'autocommit': False})
 
 buyer = 'joshguo'
 
-categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
+categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
 
 @app.route('/')
 def home():
