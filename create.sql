@@ -1,9 +1,5 @@
 CREATE TABLE Reviews(review_id SERIAL PRIMARY KEY,
-<<<<<<< HEAD
                      product_id VARCHAR(30) NOT NULL,
-=======
-                     product_id INTEGER NOT NULL,
->>>>>>> dc7bda4802b03f326558c7d7a87ead0013886937
                      seller_username VARCHAR(30) NOT NULL,
                      buyer_username VARCHAR(30) NOT NULL REFERENCES Buyers(username),
                      item_rating INTEGER NOT NULL CHECK(item_rating > 0 AND item_rating <= 5),
