@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block heading %}All Items{% endblock %}
+{% block heading %}Featured Items{% endblock %}
 {% block content %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -15,11 +15,12 @@
 {% endwith %}
 
 <ul>
-  {% for item in items %}
-  <li><a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a></li>
+  {% for category in items%}
+    <h1>{{category}}</h1>
+    {% for i in range(0, items[category]|length)%}
+      <li><a href="{{url_for('item', product_id=items[category][i].product_id)}}">{{items[category][i].item_name}}</a></li>
+    {% endfor %}
   {% endfor %}
 </ul>
 <hr/>
-<p>{{items|length}} item{{items|length|pluralize}}
-  found in the database.</p>
 {% endblock %}

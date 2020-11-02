@@ -90,7 +90,7 @@ class Reviews(db.Model):
 class Buyers(db.Model):
     __tablename__ = 'buyers'
     username = db.Column('username', db.String, primary_key=True)
-    is_seller = db.Column('is_seller', db.Boolean)
+    is_seller = db.Column('is_seller', db.Integer)
     bio = db.Column('bio', db.Text)
     name = db.Column('name', db.String)
     password = db.Column('password', db.String)

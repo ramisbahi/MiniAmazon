@@ -12,10 +12,14 @@ db = SQLAlchemy(app, session_options={'autocommit': False})
 
 buyer = 'joshguo'
 
+categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
+
 @app.route('/')
 def home():
-    items = db.session.query(models.Items).all()
+    items = {}
     username='joshguo'
+    for category in categories:
+        items[category] = db.session.query(models.Items).filter(models.Items.category == category).limit(10).all()
     cart = db.session.query(models.incart)\
         .filter(models.incart.buyer_username == username).all()
     if (cart is None):
@@ -29,10 +33,10 @@ def home():
 
 @app.route('/item/<product_id>')
 def item(product_id):
-    item = db.session.query(models.Items)\
-        .filter(models.Items.product_id == product_id).one()
+    items = db.session.query(models.Items)\
+        .filter(models.Items.product_id == product_id).all()
     buyer = 'joshguo'
-    return render_template('item.html', item=item, buyer=buyer)
+    return render_template('item.html', items=items, buyer=buyer)
 
 # adds item to wishlist
 @app.route('/add_wishlist/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
@@ -220,7 +224,7 @@ def edit_buyer(username):
 @app.route('/seller/<username>')
 def seller(username):
     seller = db.session.query(models.Buyers)\
-        .filter(models.Buyers.username == username).filter(models.Buyers.is_seller).one()
+        .filter(models.Buyers.username == username).filter(models.Buyers.is_seller == '1').one()
     seller_items = db.session.query(models.Items)\
         .filter(models.Items.seller_username == username).all()
     return render_template('seller.html', seller=seller, items=seller_items)

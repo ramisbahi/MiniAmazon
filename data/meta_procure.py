@@ -6,9 +6,9 @@ from urllib.request import urlopen
 import numpy as np
 
 
-category = 'Appliances' # change category to generate csv from meta_<category>.json
+category = 'Electronics' # change category to generate csv from meta_<category>.json
 category_name = category
-#category_name = 'Beauty' # custom name in "category" column
+category_name = 'Electronics' # custom name in "category" column
 
 
 data = []
@@ -28,7 +28,8 @@ df = df.drop(columns=['tech1', 'tech2', 'similar_item', 'fit', 'also_buy', 'bran
 df = df[df.price.str.startswith('$')] # only valid prices (cannot be null)
 df['price'] = df.price.str.slice(start=1)
 df['price'] = df.price.str.replace(',', '', regex=False) # get rid of commas in price
-pd.to_numeric(df['price'], errors='coerce').ffill() # make sure floats only
+df['price'] = df.price.apply(lambda x: pd.to_numeric(x, errors='coerce')).dropna().astype(float) # make sure floats only
+df = df[df['price'].notna()]
 
 df['description'] = df.description.apply(lambda x: x[0] if len(x) > 0 else '') # first element of description list
 df = df[df['description']!='']
@@ -38,6 +39,9 @@ df['image'] = df.image.apply(lambda x: x[0][:len(x[0])-5] + "0_.jpg" if len(x) >
 df = df[df['image']!='']
 
 df = df.rename(columns={"asin" : "product_id", "title" : "item_name"})
+
+df['item_name'] = df.item_name.str.slice(start = 0, stop = 490) # ~ 500 character limit
+df = df[df['item_name'] != '']
 
 df['category'] = category_name
 

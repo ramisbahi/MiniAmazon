@@ -2,14 +2,18 @@
 {% block heading %}{% endblock %}
 {% block content %}
 <h1><a href="/cart/{{buyer}}">View Cart</a> | <a href="/wishlist/{{buyer}}">View Wishlist</a></h1>
-<h2>Item Information: {{item.item_name}}</h2>
 
-<img src={{item.image}}>
+{% for item in items %}
+<h2>Item Information: {{item.item_name}}</h2>
+<img src={{items[0].image}}>
 <p><a href="/add_cart/product_id={{item.product_id}}&seller_username={{item.seller_username}}&buyer_username={{buyer}}">Add to Cart</a> | <a href="/add_wishlist/product_id={{item.product_id}}&seller_username={{item.seller_username}}&buyer_username={{buyer}}">Add to Wishlist</a></p>
 <p>Name: {{item.item_name}}</p>
 <p>Price: {{item.price}}</p>
 <p>Seller: {{item.seller_username}}</p>
 <p>Category: {{item.category}}</p>
 <p>Condition: {{item.condition}}</p>
+
+
 <a href="{{url_for('review', product_id=item.product_id)}}">Show reviews for {{item.item_name}}</a>
+{% endfor %}
 {% endblock %}

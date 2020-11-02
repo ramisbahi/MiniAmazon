@@ -27,6 +27,7 @@ Koalarry
 Frostrich
 Madept
 ArchPaladin
+KoalaDog
 PoorPhantasm
 HealthySphinx
 MagicalCrusader
