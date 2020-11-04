@@ -1,14 +1,29 @@
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 import models
 import forms
 import sys
 from numpy import dot
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from itsdangerous import URLSafeTimedSerializer
+import traceback
+
+#note - maiden default is "johnson"
 
 app = Flask(__name__)
 app.secret_key = 's3cr3t'
 app.config.from_object('config')
 db = SQLAlchemy(app, session_options={'autocommit': False})
+
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    # since the username is just the primary key of our buyer table, use it in the query for the user
+    return models.Buyers.query.get(user_id)
 
 buyer = 'joshguo'
 
@@ -197,11 +212,10 @@ def review(product_id):
     return render_template('reviews.html', item=item, reviews=reviews, avg_rating=avg_rating, form=form)
 
 # buyer profiles, based on drinker profiles
-@app.route('/buyer/<username>')
-def buyer(username):
-    buyer = db.session.query(models.Buyers)\
-        .filter(models.Buyers.username == username).one()
-    return render_template('buyer.html', buyer=buyer)
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('buyer.html', buyer=current_user)
 
 @app.route('/edit-buyer/<username>', methods=['GET', 'POST'])
 def edit_buyer(username):
@@ -213,7 +227,7 @@ def edit_buyer(username):
             form.errors.pop('database', None)
             models.Buyers.edit(username, form.username.data, form.bio.data, form.name.data,
                                 form.address.data)
-            return redirect(url_for('buyer', username=form.username.data))
+            return redirect(url_for('profile'))
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('edit-buyer.html', buyer=buyer, form=form)
@@ -254,6 +268,119 @@ def edit_drinker(name):
             return render_template('edit-drinker.html', drinker=drinker, form=form)
     else:
         return render_template('edit-drinker.html', drinker=drinker, form=form)
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login_post():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    remember = True if request.form.get('remember') else False
+
+    buyer = models.Buyers.query.filter_by(username=username).first()
+
+    # take the user-supplied password, hash it, and compare it to hashed password in the database
+    if not buyer or not check_password_hash(buyer.password, password):
+        flash('Incorrect username/password combination.')
+        return redirect(url_for('login')) # user doesn't exist or password is wrong, reload the page
+
+    # if the above check passes, then we know the user has the right credentials
+    login_user(buyer, remember=remember)
+    return redirect(url_for('profile'))
+
+@app.route('/forgot', methods=['POST'])
+def forgot_post():
+    username = request.form.get('username')
+    maiden = request.form.get('maiden')
+
+    buyer = models.Buyers.query.filter_by(username=username).first()
+
+    # take the user-supplied password, hash it, and compare it to hashed password in the database
+    if not buyer or not check_password_hash(buyer.maiden, maiden):
+        flash('Incorrect username/security answer combination.')
+        return redirect(url_for('forgot')) # user doesn't exist or password is wrong, reload the page
+
+    # if the above check passes, then we know the user has the right credentials
+
+    password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    password_reset_url = url_for(
+        'reset_with_token',
+        token = password_reset_serializer.dumps(username, salt='password-reset-salt'),
+        _external=True)
+
+    return redirect(password_reset_url)
+
+@app.route('/reset/<token>')
+def reset_with_token(token):
+    password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        username = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+    except:
+        flash('The password reset link is invalid or has expired.', 'error')
+        return redirect(url_for('login'))
+
+    return render_template('reset_with_token.html', token=token)
+
+
+@app.route('/reset/<token>', methods=['POST'])
+def reset_post(token):
+    password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    password = request.form.get('password')
+
+    try:
+        username = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+        buyer = models.Buyers.query.filter_by(username=username).first()
+    except:
+        traceback.print_exc()
+        flash('Invalid username!', 'error')
+        return redirect(url_for('login'))
+
+    buyer.password = generate_password_hash(password, method='sha256')
+    print("BUYER", buyer)
+    db.session.execute('UPDATE buyers SET password=:password WHERE username=:username', dict(password=password, username=username))
+    db.session.commit()
+    flash('Your password has been updated!', 'success')
+    return redirect(url_for('login'))
+
+
+@app.route('/forgot')
+def forgot():
+    return render_template('forgot.html')
+
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+@app.route('/register', methods = ['POST'])
+def register_post():
+    name = request.form.get('name')
+    username = request.form.get('username')
+    password = request.form.get('password')
+    address = request.form.get('address')
+    bio = request.form.get('bio')
+    maiden = request.form.get('maiden')
+
+    existing = models.Buyers.query.filter_by(username=username).first()
+    if existing:
+        flash('There already exists an account with this username. Please register with a different username.')
+        return redirect(url_for('register')) # username already in use
+
+    new_buyer = models.Buyers(username=username, is_seller='0', bio=bio, name=name, password=generate_password_hash(password, method='sha256'), address=address, maiden=generate_password_hash(maiden, method='sha256'))
+    db.session.add(new_buyer)
+    db.session.commit()
+    return redirect(url_for('login'))
+
 
 @app.template_filter('pluralize')
 def pluralize(number, singular='', plural='s'):

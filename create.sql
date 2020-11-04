@@ -10,8 +10,9 @@ CREATE TABLE Buyers(username VARCHAR(30) NOT NULL PRIMARY KEY,
                     is_seller BIT NOT NULL,
                     bio VARCHAR(200),
                     name VARCHAR(30) NOT NULL,
-                    password VARCHAR(30) NOT NULL,
-                    address VARCHAR(800)); /*changed to 800*/
+                    password VARCHAR(100) NOT NULL,
+                    address VARCHAR(800),
+                    maiden VARCHAR(30) NOT NULL); /*changed to 800*/
 
 INSERT INTO Buyers VALUES('ramisbahi', TRUE, 'I am cool', 'Rami Sbahi', 'superman', '3200 Jam Court\nDurham, NC 27708\nUnited States');
 INSERT INTO Buyers VALUES('chrisyang', TRUE, 'I am not very cool', 'Chris Yang', 'spiderman', '3000 Yang Court\nDurham, NC 27708\nUnited States');

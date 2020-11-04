@@ -7,9 +7,14 @@
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
     <link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen"/>
     <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+</head>
   </head>
   <body>
-    <h1><img src="https://i.ibb.co/hyFgz7B/Screen-Shot-2020-10-19-at-9-58-42-PM.png" style="float:right" height=150px/> <a href="/">Mini Amazon</a></h1>
+    <h1><img src="https://i.ibb.co/hyFgz7B/Screen-Shot-2020-10-19-at-9-58-42-PM.png" style="float:right" height=150px/> <a href="/">Home</a></h1>
+    <h1><a href="{{url_for('profile')}}">Your Profile</a>
+    <h1><a href="{{url_for('register')}}">Register</a></h1>
+    <h1><a href="{{url_for('login')}}">Log in</a></h1>
+    <h1><a href="{{url_for('logout')}}">Log out</a></h1>
     <hr/>
     <h2 id="heading">{% block heading %}{% endblock %}</h2>
     {% block content %}{% endblock %}

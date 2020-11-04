@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="column is-4 is-offset-4">
+    <h3 class="title">Please enter your new password:</h3>
+    <div class="box">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="notification is-danger">
+            {{ messages[0] }}
+        </div>
+      {% endif %}
+      {% endwith %}
+      <form method="POST" action="/reset/{{token}}">
+
+        <div class="field">
+            <div class="control">
+                <input class="input is-medium" type="password" name="password" placeholder="New Password*" required>
+            </div>
+        </div>
+
+            <button class="button is-block is-info is-large is-fullwidth">Enter</button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

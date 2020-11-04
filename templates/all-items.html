@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block heading %}Featured Items{% endblock %}
+{% block heading %}{% endblock %}
 {% block content %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -14,9 +14,12 @@
     {% endif %}
 {% endwith %}
 
+
+
+<h1>Featured Items</h1>
 <ul>
   {% for category in items%}
-    <h1>{{category}}</h1>
+    <h2>{{category}}</h2>
     {% for i in range(0, items[category]|length)%}
       <li><a href="{{url_for('item', product_id=items[category][i].product_id)}}">{{items[category][i].item_name}}</a></li>
     {% endfor %}

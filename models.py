@@ -2,6 +2,7 @@ from sqlalchemy import sql, orm, CheckConstraint, ForeignKeyConstraint
 from app import db
 from sqlalchemy import sql, orm, CheckConstraint
 from app import db
+from flask_login import UserMixin
 
 class Drinker(db.Model):
     __tablename__ = 'drinker'
@@ -87,7 +88,7 @@ class Reviews(db.Model):
                                            [Items.product_id, Items.seller_username]), {})
 
 
-class Buyers(db.Model):
+class Buyers(UserMixin, db.Model):
     __tablename__ = 'buyers'
     username = db.Column('username', db.String, primary_key=True)
     is_seller = db.Column('is_seller', db.Integer)
@@ -95,6 +96,7 @@ class Buyers(db.Model):
     name = db.Column('name', db.String)
     password = db.Column('password', db.String)
     address = db.Column('address', db.String)
+    maiden = db.Column('maiden', db.String)
     def edit(old_username, username, bio, name, address):
             try:
                 db.session.execute('UPDATE buyer SET username = :username, bio = :bio, name = :name, address = :address'
@@ -104,6 +106,8 @@ class Buyers(db.Model):
             except Exception as e:
                 db.session.rollback()
                 raise e
+    def get_id(self):
+        return (self.username)
 
 class Beer(db.Model):
     __tablename__ = 'beer'
