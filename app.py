@@ -338,9 +338,9 @@ def reset_post(token):
         flash('Invalid username!', 'error')
         return redirect(url_for('login'))
 
-    buyer.password = generate_password_hash(password, method='sha256')
+    hashedPassword = generate_password_hash(password, method='sha256')
     print("BUYER", buyer)
-    db.session.execute('UPDATE buyers SET password=:password WHERE username=:username', dict(password=password, username=username))
+    db.session.execute('UPDATE buyers SET password=:password WHERE username=:username', dict(password=hashedPassword, username=username))
     db.session.commit()
     flash('Your password has been updated!', 'success')
     return redirect(url_for('login'))
