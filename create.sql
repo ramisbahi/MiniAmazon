@@ -20,9 +20,9 @@ INSERT INTO Buyers VALUES('joshguo', FALSE, 'I am the man the myth the legend', 
 INSERT INTO Buyers VALUES('DonaldTrump', FALSE, 'I am the president', 'DJT', 'Swampman', 'White House');
 
 
-CREATE TABLE Orders(order_id SERIAL PRIMARY KEY,
+CREATE TABLE Orders(order_id SERIAL NOT NULL PRIMARY KEY,
                     buyer_username VARCHAR(30) NOT NULL REFERENCES Buyers(username),
-                    tracking_num INTEGER NOT NULL,
+                    tracking_num SERIAL NOT NULL,
                     date_returned DATE,
                     date_ordered DATE NOT NULL);
 

@@ -70,7 +70,7 @@ class Orders(db.Model):
     __tablename__ = 'orders'
     order_id = db.Column('order_id', db.Integer(), autoincrement=True, primary_key = True)
     buyer_username = db.Column('buyer_username', db.String(30))
-    tracking_num = db.Column('tracking_num', db.Integer())
+    tracking_num = db.Column('tracking_num', db.Integer(), autoincrement=True)
     date_returned = db.Column('date_returned', db.Date())
     date_ordered = db.Column('date_ordered', db.Date())
 
