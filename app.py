@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from itsdangerous import URLSafeTimedSerializer
 import traceback
+import datetime
 
 #note - maiden default is "johnson"
 
@@ -380,6 +381,25 @@ def register_post():
     db.session.add(new_buyer)
     db.session.commit()
     return redirect(url_for('login'))
+
+
+@app.route('/tracking/<tracking_num>')
+def tracking(tracking_num):
+    order = db.session.query(models.Orders).filter(models.Orders.tracking_num == tracking_num).one()
+
+
+
+    status = "Processing"
+    delta = datetime.date.today() - order.date_ordered
+    if delta.days > 2:
+        status = "Delivered"
+    elif delta.days > 0:
+        status = "Shipped"
+
+    if order.date_returned:
+        status = "Returned"
+
+    return render_template('tracking.html', status=status, order=order)
 
 
 @app.template_filter('pluralize')
