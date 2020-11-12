@@ -168,11 +168,30 @@ def cart(username):
 
 # deletes item from cart
 @app.route('/transaction_success')
-def transaction_success():
-    items = db.session.query(models.Items).all()
+def transaction_success(buyer_username):
+    items = db.session.query(models.Items)
+    cart_items = db.session.query(models.incart)\
+        .filter(models.incart.buyer_username == buyer_username).all()
+    for cart_item in cart_items:
+        db.session.execute('INSERT INTO Orders VALUES(:order_id, :buyer_username, :tracking_num, :date_returned, :date_ordered)', dict(order_id=default, buyer_username=buyer_username, tracking_num=default, date_returned=null, date_ordered=GETDATE()))
+        db.session.execute('INSERT INTO inorder VALUES(:product_id, :seller_username, :order_id, :order_quantity)', dict(product_id=cart_item.product_id, seller_username=cart_item.seller_username, order_id=, order_quantity=cart_item.order_quantity)')
+        db.session.commit()
     db.session.execute('DELETE FROM incart')
     db.session.commit()
     return render_template('all-items.html', items=items)
+
+
+@app.route('/<username>/order-history', methods=['GET', 'POST'])
+def order_history(username):
+    buyer = db.session.query(models.Buyers)\
+        .filter(models.Buyers.username == username).one()
+    items = []
+    orders = db.session.query(models.inorder).filter(models.inorder.order_id == models.Orders.order_id)
+                .filter(models.Orders.buyer_username == username).all()
+    Order = db.session.query(models.Orders).filter(models.Orders.buyer_username == username).all()
+    for order in orders:
+        items.append(db.session.query(models.Items).filter(models.Items.product_id == orders.product_id).one())
+    return render_template('order-history.html', items=items)
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
@@ -234,6 +253,8 @@ def edit_buyer(username):
             return render_template('edit-buyer.html', buyer=buyer, form=form)
     else:
         return render_template('edit-buyer.html', buyer=buyer, form=form)
+
+
 
 # seller profiles, based on drinker profiles
 @app.route('/seller/<username>')
