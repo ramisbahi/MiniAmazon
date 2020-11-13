@@ -31,13 +31,13 @@ buyer = 'joshguo'
 categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
 
 @app.route('/')
+@login_required
 def home():
     items = {}
-    username='joshguo'
     for category in categories:
         items[category] = db.session.query(models.Items).filter(models.Items.category == category).limit(10).all()
     cart = db.session.query(models.incart)\
-        .filter(models.incart.buyer_username == username).all()
+        .filter(models.incart.buyer_username == current_user.username).all()
     if (cart is None):
         flash('Cart is empty!')
     return render_template('all-items.html', items=items)
@@ -400,6 +400,27 @@ def tracking(tracking_num):
         status = "Returned"
 
     return render_template('tracking.html', status=status, order=order)
+
+@app.route('/return_item/product_id=<product_id>&seller_username=<seller_username>&order_id=<order_id>')
+def return_item(product_id, seller_username, order_id):
+    item_inorder = db.session.query(models.inorder).filter(models.inorder.product_id == product_id).filter(models.inorder.seller_username == seller_username).filter(models.inorder.order_id == order_id).one()
+    # check if already returned
+    if item_inorder.date_returned:
+        # TODO: notify
+        return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
+
+    # change date_returned in inorder
+    date_returned = datetime.date.today().strftime('%Y-%m-%d')
+    db.session.execute('UPDATE inorder SET date_returned=:date_returned WHERE product_id=:product_id AND seller_username=:seller_username AND order_id=:order_id', dict(date_returned=date_returned, product_id=product_id, seller_username=seller_username, order_id=order_id))
+
+    # increase quantity of item with product_id and seller_username by order_quantity
+    additional_quantity = item_inorder.order_quantity
+    db.session.execute('UPDATE Items SET quantity=quantity+:additional_quantity WHERE product_id=:product_id AND seller_username=:seller_username', dict(additional_quantity=additional_quantity, product_id=product_id, seller_username=seller_username))
+
+    db.session.commit()
+
+
+    return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
 
 
 @app.template_filter('pluralize')

@@ -58,6 +58,7 @@ class inorder(db.Model):
     seller_username = db.Column('seller_username', db.String(30), primary_key=True)
     order_id = db.Column('order_id', db.Integer(), primary_key = True)
     order_quantity = db.Column('order_quantity', db.Integer())
+    date_returned = db.Column('date_returned', db.Date())
 
 class incart(db.Model):
     __tablename__ = 'incart'

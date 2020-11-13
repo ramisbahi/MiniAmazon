@@ -45,6 +45,7 @@ CREATE TABLE inorder(product_id VARCHAR(30) NOT NULL,
                     seller_username VARCHAR(30) NOT NULL,
                     order_id INTEGER NOT NULL REFERENCES Orders(order_id),
                     order_quantity INTEGER NOT NULL CHECK(order_quantity > 0),
+                    date_returned DATE,
                     PRIMARY KEY(product_id, seller_username, order_id),
                     FOREIGN KEY(product_id, seller_username) REFERENCES Items(product_id, seller_username));
 
