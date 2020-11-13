@@ -1,39 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="column is-4 is-offset-4">
-    <h3 class="title">Login</h3>
-    <div class="box">
-      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="notification is-danger">
-            {{ messages[0] }}
-        </div>
-      {% endif %}
-      {% endwith %}
-      <form method="POST" action="/login">
-            <div class="field">
-                <div class="control">
-                    <input class="input is-large" type="username" name="username" placeholder="Username" autofocus="">
-                </div>
+<div class="columns is-centered">
+    <div class="column is-5">
+        <h3 class="title">Mini-Amazon</h3>
+        <div class="box">
+            <h5 class="title is-5 is-pulled-left">Sign-in</h5>
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="notification is-danger">
+                {{ messages[0] }}
             </div>
-
+          {% endif %}
+          {% endwith %}
+          <form method="POST" action="/login">
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="password" name="password" placeholder="Password">
+                    <input class="input is-info is-large" type="username" name="username" placeholder="Username" autofocus="">
                 </div>
             </div>
             <div class="field">
+                <div class="control">
+                    <input class="input is-info is-large" type="password" name="password" placeholder="Password">
+                </div>
+            </div>
+            <div class="field is-pulled-left">
                 <label class="checkbox">
                     <input type="checkbox">
                     Remember me
                 </label>
             </div>
-            <button class="button is-block is-info is-large is-fullwidth">Login</button>
-        </form>
-
-        <a href="{{url_for('register')}}"><button class="button is-block is-info is-large is-fullwidth">Register</button></a>
-        <a href="{{url_for('forgot')}}"><button class="button is-block is-info is-large is-fullwidth">Forgot your password?</button></a>
+            <button class="button is-primary is-large is-fullwidth">Sign-in</button><br>
+          </form>
+            <a href="{{url_for('forgot')}}">
+                <button class="button is-light is-large is-light is-fullwidth">Forgot your password?</button>
+            </a>
+            <hr>
+            <h5 class="title is-5 is-pulled-left">Need an account?</h5>
+            <a href="{{url_for('register')}}">
+                <button class="button is-primary is-large is-fullwidth">Register</button>
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}
