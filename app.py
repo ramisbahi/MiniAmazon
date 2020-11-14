@@ -190,18 +190,19 @@ def cart(username):
     return render_template('cart.html', cart_items=cart_items, items=items, username=username, total_price=total_price, total_quantity=total_quantity)
 
 # deletes item from cart
-@app.route('/transaction_success')
+@app.route('/transaction_success/<buyer_username>')
 def transaction_success(buyer_username):
     items = db.session.query(models.Items)
     cart_items = db.session.query(models.incart)\
         .filter(models.incart.buyer_username == buyer_username).all()
+    date = str(datetime.date.today())
+    db.session.execute('INSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=buyer_username, date_bought=date))
     for cart_item in cart_items:
-        db.session.execute('INSERT INTO Orders VALUES(:order_id, :buyer_username, :tracking_num, :date_returned, :date_ordered)', dict(order_id=default, buyer_username=buyer_username, tracking_num=default, date_returned=null, date_ordered=GETDATE()))
-        db.session.execute('INSERT INTO inorder VALUES(:product_id, :seller_username, :order_id, :order_quantity)', dict(product_id=cart_item.product_id, seller_username=cart_item.seller_username, order_id=Orders.order_id, order_quantity=cart_item.order_quantity))
-        db.session.commit()
-    db.session.execute('DELETE FROM incart')
+        orderID = db.session.query(func.max(models.Orders.order_id)).scalar()
+        db.session.execute('INSERT INTO inorder VALUES(:product_id, :seller_username, :order_id, :order_quantity)', dict(product_id=cart_item.product_id, seller_username=cart_item.seller_username, order_id=orderID, order_quantity=cart_item.cart_quantity))
+    db.session.execute(('DELETE FROM incart WHERE buyer_username = :buyer_username'), dict(buyer_username=buyer_username))
     db.session.commit()
-    return render_template('all-items.html', items=items)
+    return redirect(url_for('all-items.html', items=items), code=307)
 
 
 @app.route('/<username>/order-history', methods=['GET', 'POST'])
@@ -209,14 +210,15 @@ def order_history(username):
     buyer = db.session.query(models.Buyers)\
         .filter(models.Buyers.username == username).one()
     items = []
-    orders = db.session.query(models.inorder).filter(models.inorder.order_id == models.Orders.order_id).filter(models.Orders.buyer_username == username).all()
-    Order = db.session.query(models.Orders).filter(models.Orders.buyer_username == username).all()
+    orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == username).all()
     for order in orders:
-        items.append(db.session.query(models.Items).filter(models.Items.product_id == orders.product_id).one())
-    return render_template('order_history.html', items=items)
-
-
-
+        currItems = []
+        itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).all()
+        for item in itemList:
+            itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
+            currItems.append(itemInfo)
+        items.append(currItems)
+    return render_template('order_history.html', items=items, orders=orders)
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
