@@ -1,5 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
+
 import models
 import forms
 import sys
@@ -34,13 +36,34 @@ categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronic
 @login_required
 def home():
     items = {}
+    recs = []
     for category in categories:
         items[category] = db.session.query(models.Items).filter(models.Items.category == category).limit(10).all()
     cart = db.session.query(models.incart)\
         .filter(models.incart.buyer_username == current_user.username).all()
     if (cart is None):
         flash('Cart is empty!')
-    return render_template('all-items.html', items=items, form=forms.SearchFormFactory.form())
+
+    # Find latest order/purchase to generate recommendations off of
+    latest_order = db.session.query(models.Orders) \
+        .filter(models.Orders.buyer_username == current_user.username).order_by(desc(models.Orders.date_ordered)).first()
+
+    # Get any item_id from that order
+    latest_item_id = db.session.query(models.inorder) \
+        .filter(models.inorder.order_id == latest_order.order_id).first() if latest_order is not None else None
+
+    # Get actual item from item_id
+    latest_item = db.session.query(models.Items) \
+        .filter(models.Items.product_id == latest_item_id.product_id).first() if latest_item_id is not None else None
+
+    # Get the first word in the item name
+    first_word = latest_item.item_name.split(' ', 1)[0] if latest_item is not None else None
+
+    # Get recommended products based on that first word
+    recs = db.session.query(models.Items) \
+        .filter(models.Items.item_name.like('%{}%'.format(first_word))).limit(5).all() if first_word is not None else []
+
+    return render_template('all-items.html', items=items, form=forms.SearchFormFactory.form(), recs=recs)
 
 
 #def all_drinkers():
