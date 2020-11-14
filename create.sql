@@ -23,7 +23,6 @@ INSERT INTO Buyers VALUES('DonaldTrump', FALSE, 'I am the president', 'DJT', 'Sw
 CREATE TABLE Orders(order_id SERIAL NOT NULL PRIMARY KEY,
                     buyer_username VARCHAR(30) NOT NULL REFERENCES Buyers(username),
                     tracking_num SERIAL NOT NULL,
-                    date_returned DATE,
                     date_ordered DATE NOT NULL);
 
 
