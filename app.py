@@ -50,9 +50,9 @@ def home():
 @app.route('/item/<product_id>')
 def item(product_id):
     items = db.session.query(models.Items)\
-        .filter(models.Items.product_id == product_id).all()
+        .filter(models.Items.product_id == product_id).first()
     buyer = 'joshguo'
-    return render_template('item.html', items=items, buyer=buyer)
+    return render_template('item.html', items=[items], buyer=buyer)
 
 # adds item to wishlist
 @app.route('/add_wishlist/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
@@ -177,7 +177,7 @@ def transaction_success():
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
     item = db.session.query(models.Items) \
-        .filter(models.Items.product_id == product_id).one()
+        .filter(models.Items.product_id == product_id).first()
 
     reviews = db.session.query(models.Reviews) \
         .filter(models.Reviews.product_id == product_id) \
@@ -421,6 +421,18 @@ def return_item(product_id, seller_username, order_id):
 
 
     return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
+
+
+# Expects a query e.g. /search?q=<something>
+@app.route('/search')
+def search():
+    q = request.args.get('user')
+
+    items = db.session.query(models.Items) \
+        .filter(models.Items.item_name == '%{}%'.format(q)).limit(10).all()
+
+    return render_template('search-items.html', items=items)
+
 
 
 @app.template_filter('pluralize')
