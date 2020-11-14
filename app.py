@@ -212,7 +212,7 @@ def order_history(username):
     orders = db.session.query(models.inorder).filter(models.inorder.order_id == models.Orders.order_id).filter(models.Orders.buyer_username == username).all()
     Order = db.session.query(models.Orders).filter(models.Orders.buyer_username == username).all()
     for order in orders:
-        items.append(db.session.query(models.Items).filter(models.Items.product_id == orders.product_id).one())
+        items.append(db.session.query(models.Items).filter(models.Items.product_id == order.product_id).one())
     return render_template('order_history.html', items=items)
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
