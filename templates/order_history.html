@@ -2,19 +2,22 @@
 {% block heading %}Order History{% endblock %}
 {% block content %}
 <ul>
-  {% for i in range(0, items|length)%}
-  <li>
-    <h1> Order ID: {{orders[i].order_id}} </h1>
-    <p> Tracking Number: {{Order[i].tracking_num}} </p>
-    <p> Item: {{items[i].item_name}} </p>
-    <p> Category: {{items[i].category}}
-    <p> Condition: {{items[i].condition}} </p>
-    <p> Price: {{items[i].price}} </p>
-    <p> Quantity: {{orders[i].order_quantity}} </p>
-    <p> Image: {{items[i].image}} </p>
-    <p> Date Bought: {{Order[i].date_ordered}} </p>
-    <p> Date Returned: {{Order[i].date_returned}} </p>
-  </li>
+  {% for order in range(0, orders|length)%}
+    <h1> Order ID: {{orders[order].order_id}} </h1>
+    <li>
+      <p> Tracking Number: {{orders[order].tracking_num}} </p>
+    </li>
+
+
+    {% for item in range(0, items[order]|length)%}
+      <li>
+        <p> Item: <a href="{{url_for('item', product_id=items[order][item].product_id)}}">{{items[order][item].item_name}}</a> </p>
+        <p> Seller: {{items[order][item].seller_username}} </p>
+        <p> Condition: {{items[order][item].condition}} </p>
+        <p> Price: {{items[order][item].price}} </p>
+        <img src={{items[order][item].image}}>
+      </li>
+  {% endfor %}
   {% endfor %}
 </ul>
 <hr/>
