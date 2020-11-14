@@ -40,7 +40,7 @@ def home():
         .filter(models.incart.buyer_username == current_user.username).all()
     if (cart is None):
         flash('Cart is empty!')
-    return render_template('all-items.html', items=items)
+    return render_template('all-items.html', items=items, form=forms.SearchFormFactory.form())
 
 
 #def all_drinkers():
@@ -172,7 +172,7 @@ def transaction_success():
     items = db.session.query(models.Items).all()
     db.session.execute('DELETE FROM incart')
     db.session.commit()
-    return render_template('all-items.html', items=items)
+    return render_template('all-items.html', items=items, form=forms.SearchFormFactory.form())
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
@@ -423,15 +423,28 @@ def return_item(product_id, seller_username, order_id):
     return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
 
 
+@app.route('/search', methods=['GET'])
+def search_page(items):
+    return render_template('search-items.html', items=items, form=form)
+
+
 # Expects a query e.g. /search?q=<something>
-@app.route('/search')
+@app.route('/search', methods=['POST'])
 def search():
-    q = request.args.get('user')
+    items = []
 
-    items = db.session.query(models.Items) \
-        .filter(models.Items.item_name == '%{}%'.format(q)).limit(10).all()
+    form = forms.SearchFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            items = db.session.query(models.Items) \
+                .filter(models.Items.item_name.like('%{}%'.format(form.query.data))).limit(10).all()
 
-    return render_template('search-items.html', items=items)
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return redirect(url_for('home'))
+
+    return render_template('search-items.html', items=items, form=form)
+
 
 
 
