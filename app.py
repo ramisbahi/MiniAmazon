@@ -428,7 +428,6 @@ def search_page(items):
     return render_template('search-items.html', items=items, form=form)
 
 
-# Expects a query e.g. /search?q=<something>
 @app.route('/search', methods=['POST'])
 def search():
     items = []
