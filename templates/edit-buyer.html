@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block heading %}Edit Buyer Information: {{buyer.username}}{% endblock %}
 {% block content %}
-<form action="{{url_for('edit_buyer', username=buyer.username)}}" method="POST">
+<form action="{{url_for('edit_buyer')}}" method="POST">
     {{form.csrf_token}}
     <p>
         Username: {{form.username}}

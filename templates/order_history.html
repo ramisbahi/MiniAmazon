@@ -5,7 +5,7 @@
   {% for order in range(0, orders|length)%}
     <h1> Order ID: {{orders[order].order_id}} </h1>
     <li>
-      <p> Tracking Number: {{orders[order].tracking_num}} </p>
+      <p> <a href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">Tracking Number: {{orders[order].tracking_num}}</a></p>
     </li>
 
 

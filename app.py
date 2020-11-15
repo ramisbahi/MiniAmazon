@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 
 import models
 import forms
@@ -28,7 +28,7 @@ def load_user(user_id):
     # since the username is just the primary key of our buyer table, use it in the query for the user
     return models.Buyers.query.get(user_id)
 
-buyer = 'joshguo'
+
 
 categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
 
@@ -74,52 +74,50 @@ def home():
 def item(product_id):
     items = db.session.query(models.Items)\
         .filter(models.Items.product_id == product_id).first()
-    buyer = 'joshguo'
-    return render_template('item.html', items=[items], buyer=buyer)
+    return render_template('item.html', items=[items])
 
 # adds item to wishlist
-@app.route('/add_wishlist/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def add_wishlist(product_id, seller_username, buyer_username):
-    currItem = db.session.query(models.inwishlist).filter(models.inwishlist.product_id == product_id).filter(models.inwishlist.seller_username == models.inwishlist.seller_username).filter(models.inwishlist.buyer_username == models.inwishlist.buyer_username).all() # going to subtract quantity from this item
+@app.route('/add_wishlist/product_id=<product_id>&seller_username=<seller_username>')
+def add_wishlist(product_id, seller_username):
+    currItem = db.session.query(models.inwishlist).filter(models.inwishlist.product_id == product_id).filter(models.inwishlist.seller_username == seller_username).filter(models.inwishlist.buyer_username == current_user.username).all() # going to subtract quantity from this item
     if currItem:
-        return redirect(url_for('add_quantity_wishlist', product_id=product_id, seller_username=seller_username, buyer_username=buyer_username)) # increase quantity by 1 if already in wish list
-    else: # not in wishlist already
-        db.session.execute('INSERT INTO inwishlist VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
-        db.session.commit()
-        return redirect(url_for('wishlist', username=buyer_username), code=307)
+        return redirect(url_for('add_quantity_wishlist', product_id=product_id, seller_username=seller_username)) # increase quantity by 1 if already in wish list
+    # not in wishlist already
+    db.session.execute('INSERT INTO inwishlist VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
+    db.session.commit()
+    return redirect(url_for('wishlist'), code=307)
 
 # decreases quantity by 1 for item in wishlist
-@app.route('/subtract_quantity_wishlist/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def subtract_quantity_wishlist(product_id, seller_username, buyer_username):
-    currItem = db.session.query(models.inwishlist).filter(models.inwishlist.product_id == product_id).filter(models.inwishlist.seller_username == models.inwishlist.seller_username).filter(models.inwishlist.buyer_username == models.inwishlist.buyer_username).one() # going to subtract quantity from this item
+@app.route('/subtract_quantity_wishlist/product_id=<product_id>&seller_username=<seller_username>')
+def subtract_quantity_wishlist(product_id, seller_username):
+    currItem = db.session.query(models.inwishlist).filter(models.inwishlist.product_id == product_id).filter(models.inwishlist.seller_username == seller_username).filter(models.inwishlist.buyer_username == current_user.username).one() # going to subtract quantity from this item
     currQuantity = currItem.wishlist_quantity
     if currQuantity >= 2:
-        db.session.execute('UPDATE inwishlist SET wishlist_quantity = wishlist_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+        db.session.execute('UPDATE inwishlist SET wishlist_quantity = wishlist_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
-        return redirect(url_for('wishlist', username=buyer_username), code=307)
+        return redirect(url_for('wishlist'), code=307)
     else: # delete item if only 1
-        return redirect(url_for('delete_wishlist', product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+        return redirect(url_for('delete_wishlist', product_id=product_id, seller_username=seller_username))
 
 # increases quantity by 1 for item in wishlist
-@app.route('/add_quantity_wishlist/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def add_quantity_wishlist(product_id, seller_username, buyer_username):
-    db.session.execute('UPDATE inwishlist SET wishlist_quantity = wishlist_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+@app.route('/add_quantity_wishlist/product_id=<product_id>&seller_username=<seller_username>')
+def add_quantity_wishlist(product_id, seller_username):
+    db.session.execute('UPDATE inwishlist SET wishlist_quantity = wishlist_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('wishlist', username=buyer_username), code=307)
+    return redirect(url_for('wishlist'), code=307)
 
 # deletes item from wishlist
-@app.route('/delete_wishlist/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def delete_wishlist(product_id, seller_username, buyer_username):
-    db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+@app.route('/delete_wishlist/product_id=<product_id>&seller_username=<seller_username>')
+def delete_wishlist(product_id, seller_username):
+    db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('wishlist', username=buyer_username), code=307)
+    return redirect(url_for('wishlist'), code=307)
 
 # returns wishlist for user
-@app.route('/wishlist/<username>')
-def wishlist(username):
-    username='joshguo'
+@app.route('/wishlist')
+def wishlist():
     wishlist_items = db.session.query(models.inwishlist)\
-        .filter(models.inwishlist.buyer_username == username).all()
+        .filter(models.inwishlist.buyer_username == current_user.username).all()
     items = []
 
     for wishlist_item in wishlist_items:
@@ -131,51 +129,50 @@ def wishlist(username):
     total_quantity = 0
     for quantity in wishlist_quantities:
         total_quantity += quantity
-    return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=username, total_price=total_price, total_quantity=total_quantity)
+    return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
 
 # adds item to cart
-@app.route('/add_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def add_cart(product_id, seller_username, buyer_username):
-    currItem = db.session.query(models.incart).filter(models.incart.product_id == product_id).filter(models.incart.seller_username == models.incart.seller_username).filter(models.incart.buyer_username == models.incart.buyer_username).all() # going to subtract quantity from this item
-    if currItem:
-        return redirect(url_for('add_quantity_cart', product_id=product_id, seller_username=seller_username, buyer_username=buyer_username)) # increase quantity by 1 if already in wish list
+@app.route('/add_cart/product_id=<product_id>&seller_username=<seller_username>')
+def add_cart(product_id, seller_username):
+    currItem = db.session.query(models.incart).filter(models.incart.product_id == product_id).filter(models.incart.seller_username == seller_username).filter(models.incart.buyer_username == current_user.username).all() #  item
+    if currItem: # in cart already
+        return redirect(url_for('add_quantity_cart', product_id=product_id, seller_username=seller_username)) # increase quantity by 1 if already in wish list
     else: # not in cart already
-        db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+        db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
-        return redirect(url_for('cart', username=buyer_username), code=307)
+        return redirect(url_for('cart', username=current_user.username), code=307)
 
 # decreases quantity by 1 for item in cart
-@app.route('/subtract_quantity_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def subtract_quantity_cart(product_id, seller_username, buyer_username):
+@app.route('/subtract_quantity_cart/product_id=<product_id>&seller_username=<seller_username>')
+def subtract_quantity_cart(product_id, seller_username):
     currItem = db.session.query(models.incart).filter(models.incart.product_id == product_id).filter(models.incart.seller_username == models.incart.seller_username).filter(models.incart.buyer_username == models.incart.buyer_username).one() # going to subtract quantity from this item
     currQuantity = currItem.cart_quantity
     if currQuantity >= 2:
-        db.session.execute('UPDATE incart SET cart_quantity = cart_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+        db.session.execute('UPDATE incart SET cart_quantity = cart_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
-        return redirect(url_for('cart', username=buyer_username), code=307)
+        return redirect(url_for('cart', username=current_user.username), code=307)
     else: # delete item if only 1
-        return redirect(url_for('delete_cart', product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+        return redirect(url_for('delete_cart', product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
 
 # increases quantity by 1 for item in cart
-@app.route('/add_quantity_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def add_quantity_cart(product_id, seller_username, buyer_username):
-    db.session.execute('UPDATE incart SET cart_quantity = cart_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+@app.route('/add_quantity_cart/product_id=<product_id>&seller_username=<seller_username>')
+def add_quantity_cart(product_id, seller_username):
+    db.session.execute('UPDATE incart SET cart_quantity = cart_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('cart', username=buyer_username), code=307)
+    return redirect(url_for('cart', username=current_user.username), code=307)
 
 # deletes item from cart
-@app.route('/delete_cart/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
-def delete_cart(product_id, seller_username, buyer_username):
-    db.session.execute('DELETE FROM incart WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=buyer_username))
+@app.route('/delete_cart/product_id=<product_id>&seller_username=<seller_username>')
+def delete_cart(product_id, seller_username):
+    db.session.execute('DELETE FROM incart WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('cart', username=buyer_username), code=307)
+    return redirect(url_for('cart', username=current_user.username), code=307)
 
 # returns cart for user
-@app.route('/cart/<username>')
-def cart(username):
-    username='joshguo'
+@app.route('/cart')
+def cart():
     cart_items = db.session.query(models.incart)\
-        .filter(models.incart.buyer_username == username).all()
+        .filter(models.incart.buyer_username == current_user.username).all()
     items = []
 
     for cart_item in cart_items:
@@ -187,30 +184,29 @@ def cart(username):
     total_quantity = 0
     for quantity in cart_quantities:
         total_quantity += quantity
-    return render_template('cart.html', cart_items=cart_items, items=items, username=username, total_price=total_price, total_quantity=total_quantity)
+    return render_template('cart.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
 
 # deletes item from cart
-@app.route('/transaction_success/<buyer_username>')
-def transaction_success(buyer_username):
+@app.route('/transaction_success/')
+def transaction_success():
     items = db.session.query(models.Items)
     cart_items = db.session.query(models.incart)\
-        .filter(models.incart.buyer_username == buyer_username).all()
+        .filter(models.incart.buyer_username == current_user.username).all()
     date = str(datetime.date.today())
-    db.session.execute('INSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=buyer_username, date_bought=date))
+    db.session.execute('INSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=current_user.username, date_bought=date))
     for cart_item in cart_items:
         orderID = db.session.query(func.max(models.Orders.order_id)).scalar()
         db.session.execute('INSERT INTO inorder VALUES(:product_id, :seller_username, :order_id, :order_quantity)', dict(product_id=cart_item.product_id, seller_username=cart_item.seller_username, order_id=orderID, order_quantity=cart_item.cart_quantity))
-    db.session.execute(('DELETE FROM incart WHERE buyer_username = :buyer_username'), dict(buyer_username=buyer_username))
+    db.session.execute(('DELETE FROM incart WHERE buyer_username = :buyer_username'), dict(buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('all-items.html', items=items), code=307)
+    return redirect(url_for('home'), code=307)
 
 
-@app.route('/<username>/order-history', methods=['GET', 'POST'])
-def order_history(username):
-    buyer = db.session.query(models.Buyers)\
-        .filter(models.Buyers.username == username).one()
+@app.route('/order-history', methods=['GET', 'POST'])
+@login_required
+def order_history():
     items = []
-    orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == username).all()
+    orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == current_user.username).all()
     for order in orders:
         currItems = []
         itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).all()
@@ -264,22 +260,21 @@ def review(product_id):
 def profile():
     return render_template('buyer.html', buyer=current_user)
 
-@app.route('/edit-buyer/<username>', methods=['GET', 'POST'])
-def edit_buyer(username):
-    buyer = db.session.query(models.Buyers)\
-        .filter(models.Buyers.username == username).one()
+@app.route('/edit-buyer', methods=['GET', 'POST'])
+@login_required
+def edit_buyer():
     form = forms.BuyerEditFormFactory.form(buyer)
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Buyers.edit(username, form.username.data, form.bio.data, form.name.data,
+            models.Buyers.edit(current_user.username, form.username.data, form.bio.data, form.name.data,
                                 form.address.data)
             return redirect(url_for('profile'))
         except BaseException as e:
             form.errors['database'] = str(e)
-            return render_template('edit-buyer.html', buyer=buyer, form=form)
+            return render_template('edit-buyer.html', buyer=current_user, form=form)
     else:
-        return render_template('edit-buyer.html', buyer=buyer, form=form)
+        return render_template('edit-buyer.html', buyer=current_user, form=form)
 
 # seller profiles, based on drinker profiles
 @app.route('/seller/<username>')
@@ -442,8 +437,7 @@ def tracking(tracking_num):
     elif delta.days > 0:
         status = "Shipped"
 
-    if order.date_returned:
-        status = "Returned"
+
 
     return render_template('tracking.html', status=status, order=order)
 
@@ -453,7 +447,7 @@ def return_item(product_id, seller_username, order_id):
     # check if already returned
     if item_inorder.date_returned:
         # TODO: notify
-        return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
+        return redirect(url_for('order', username=current_user.username), code=307) # TODO: go back to order
 
     # change date_returned in inorder
     date_returned = datetime.date.today().strftime('%Y-%m-%d')

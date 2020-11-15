@@ -12,9 +12,11 @@
   <body>
     <h1><img src="https://i.ibb.co/hyFgz7B/Screen-Shot-2020-10-19-at-9-58-42-PM.png" style="float:right" height=150px/> <a href="/">Home</a></h1>
     <h1><a href="{{url_for('profile')}}">Your Profile</a>
-    <h1><a href="{{url_for('register')}}">Register</a></h1>
     <h1><a href="{{url_for('login')}}">Log in</a></h1>
     <h1><a href="{{url_for('logout')}}">Log out</a></h1>
+    <h1><a href="/cart">View Cart</a></h1>
+    <h1><a href="/wishlist">View Wishlist</a></h1>
+    <h1><a href="/order-history">Order History</a></h1>
     <hr/>
     <h2 id="heading">{% block heading %}{% endblock %}</h2>
     {% block content %}{% endblock %}

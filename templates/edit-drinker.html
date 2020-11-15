@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block heading %}Edit Drinker Information: {{drinker.name}}{% endblock %}
 {% block content %}
-<form action="{{url_for('edit_drinker', name=drinker.name)}}" method="POST">
+<form action="{{url_for('edit_drinker')}}" method="POST">
   {{form.csrf_token}}
   <p>
     Name: {{form.name}}
