@@ -225,17 +225,25 @@ def review(product_id):
         .filter(models.Reviews.product_id == product_id) \
         .group_by(models.Reviews.review_id).all()
 
-
     form = forms.ReviewFormFactory.form()
     if form.validate_on_submit():
+        num_reviews = len([r for r in reviews if r.buyer_username == current_user.username])
+        num_purchases = len(db.session.query(models.Orders, models.inorder)
+                            .filter(models.Orders.buyer_username == current_user.username)
+                            .filter(models.Orders.order_id == models.inorder.order_id)
+                            .filter(models.inorder.product_id == product_id).all())
+
+        if num_reviews >= num_purchases:
+            flash('You can only review an item once for each purchase')
+            return redirect(url_for('review', product_id=product_id))
+
         try:
             new_review = models.Reviews()
             new_review.item_rating = form.item_rating.data
             new_review.comments = form.comments.data
             new_review.product_id = product_id
             new_review.seller_username = item.seller_username
-            # TODO: change once buyer functionality exists
-            new_review.buyer_username = 'joshguo'
+            new_review.buyer_username = current_user.username
             print(new_review)
 
             db.session.add(new_review)
