@@ -224,6 +224,7 @@ def order_history():
 @login_required
 def sales_history():
     items = []
+    itemsSold = db.session.query(models.Items).filter(models.Items.seller_username == current_user.seller_username).all()
     orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == current_user.username).all()
     for order in orders:
         currItems = []
@@ -233,6 +234,20 @@ def sales_history():
             currItems.append(itemInfo)
         items.append(currItems)
     return render_template('sales_history.html', items=items, orders=orders)
+
+@app.route('/edit-item', methods=['GET', 'POST'])
+@login_required
+def edit_item(item):
+    form = forms.ItemEditFormFactory.form(item)
+    if form.validate_on_submit():
+        form.errors.pop('database', None)
+        db.session.edit(item.product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, form.image.data, form.description.data)
+        db.session.commit()
+
+        flash('Item been modified successfully')
+        return redirect(url_for('home'), code=307)
+
+    return render_template('edit-item.html', form=form)
 
 @app.route('/post-item', methods=['GET', 'POST'])
 @login_required

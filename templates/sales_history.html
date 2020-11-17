@@ -1,6 +1,11 @@
 {% extends "base.html" %}
-{% block heading %}Sales History{% endblock %}
+{% block heading %}Items Sold/Sales History{% endblock %}
 {% block content %}
+
+<h2> Items Currently Sold </h2>
+{% for item in range(0, itemsSold|length)%}
+  <p> Item: <a href="{{url_for('edit_item', item=itemsSold[item])}}">{{itemsSold.item_name}}</a> </p>
+
 <ul>
     {% for order in range(0, orders|length)%}
       {% for item in range(0, items[order]|length)%}
