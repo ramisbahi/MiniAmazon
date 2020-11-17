@@ -74,10 +74,12 @@ def home():
 #    return render_template('all-drinkers.html', drinkers=drinkers)
 
 @app.route('/item/<product_id>')
+@login_required
 def item(product_id):
     items = db.session.query(models.Items)\
         .filter(models.Items.product_id == product_id).first()
     return render_template('item.html', items=[items])
+
 
 # adds item to wishlist
 @app.route('/add_wishlist/product_id=<product_id>&seller_username=<seller_username>')
@@ -118,6 +120,7 @@ def delete_wishlist(product_id, seller_username):
 
 # returns wishlist for user
 @app.route('/wishlist')
+@login_required
 def wishlist():
     wishlist_items = db.session.query(models.inwishlist)\
         .filter(models.inwishlist.buyer_username == current_user.username).all()
