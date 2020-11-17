@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, func
 
+import os
 import models
 import forms
 import sys
@@ -553,4 +554,5 @@ def pluralize(number, singular='', plural='s'):
     return singular if number == 1 else plural
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
