@@ -64,7 +64,7 @@ class PostingFormFactory:
     def form():
         class F(FlaskForm):
             item_name = StringField(default='')
-            category = SelectField(u'Category', choices=[('Appliances', 'Appliances'), ('Beauty', 'Beauty'), ('Cell Phones and Accessories', 'Cell Phones and Accessories'), ('Electronics', 'Electronics'), ('Fashion', 'Fashion'), ('Gift Cards', 'Gift Cards'), ('Industrial and Scientific', 'Industrial and Scientific'), ('Luxury Beauty', 'Luxury Beauty'), ('Office Products', 'Office Products'), ('Pantry', 'Pantry'), ('Software', 'Software'), ('Video Games','Video Games')])
+            category = SelectField(u'Category', choices=[('Appliances', 'Appliances'), ('Beauty', 'Beauty'), ('Cell Phones and Accessories', 'Cell Phones and Accessories'), ('Electronics', 'Electronics'), ('Fashion', 'Fashion'), ('Gift Cards', 'Gift Cards'), ('Industrial and Scientific', 'Industrial and Scientific'), ('Luxury Beauty', 'Luxury Beauty'), ('Office Products', 'Office Products'), ('Pantry', 'Pantry'), ('Software', 'Software'), ('Tools and Home Improvement', 'Tools and Home Improvement'), ('Video Games','Video Games')])
             condition = SelectField(u'Condition', choices=[('New', 'New'), ('Used - Like New', 'Used - Like New'), ('Used - Very Good', 'Used - Very Good'), ('Used - Good', 'Used - Good'), ('Used - Acceptable', 'Used - Acceptable')])
             price = FloatField()
             quantity = IntegerField()

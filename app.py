@@ -32,7 +32,7 @@ def load_user(user_id):
 
 
 
-categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
+categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Tools and Home Improvement', 'Video Games']
 
 @app.route('/')
 @login_required
@@ -293,7 +293,7 @@ def review(product_id):
 
 # buyer profiles, based on drinker profiles
 @app.route('/profile')
-@login_required
+@/_required
 def profile():
     return render_template('buyer.html', buyer=current_user)
 
