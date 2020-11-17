@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block heading %}{% endblock %}
 {% block content %}
+
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         {% for message in messages %}
@@ -16,9 +17,8 @@
 
 <form action="{{url_for('search')}}" method="POST">
     {{form.csrf_token}}
-    <p>
-        Search: {{form.query}}
-        {% if form.query.errors %}
+    {{form.query}}
+    {% if form.query.errors %}
             <ul>{% for error in form.query.errors %}<li>{{error}}</li>{% endfor %}</ul>
         {% endif %}
     </p>
@@ -28,22 +28,79 @@
     {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
 </form>
 
-<h1>Recommended Based on Purchase History</h1>
-<ul>
-    {% for item in recs%}
-        <li><a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a></li>
-    {% endfor %}
-</ul>
-
-
-<h1>Featured Items</h1>
-<ul>
-  {% for category in items%}
-    <h2>{{category}}</h2>
-    {% for i in range(0, items[category]|length)%}
-      <li><a href="{{url_for('item', product_id=items[category][i].product_id)}}">{{items[category][i].item_name}}</a></li>
-    {% endfor %}
-  {% endfor %}
-</ul>
-<hr/>
+<div class="columns is-centered">
+    <div class="column is-white is-9">
+        <div class="box">
+            {% if recs %}
+                <h4 class="title is-4">Recommended Items For You</h4>
+                {% for item in recs%}
+                <div class="columns">
+                    <div class="column is-one-third">
+                        <figure class="image is-128x128" style="margin-left:80px">
+                            <img src={{item.image}}>
+                        </figure>
+                    </div>
+                    <div class="column is-one-half">
+                        <button class="button is-primary is-inverted is-medium is-centered" style="white-space:normal;margin-top:20px;width:500px;height:auto;">
+                            <a href="{{url_for('item', product_id=item.product_id)}}">
+                                {{item.item_name}}
+                            </a>
+                        </button>
+                        <p class="title is-6" style="margin-top:5px;">
+                            Sold by:
+                            <span class="tag">
+                                {{item.seller_username}}
+                            </span>
+                        </p>
+                        <p class="subtitle is-6">
+                            Price:
+                            <span class="tag">
+                                ${{item.price}}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+            {% endif %}
+            <h4 class="title is-4">Featured Items</h4>
+            <ul>
+                {% for category in items%}
+                <h5 class="title is-5">{{category}}</h5>
+                <hr>
+                    {% for i in range(0, items[category]|length)%}
+                        <div class="columns">
+                            <div class="column is-one-third">
+                                <figure class="image is-128x128" style="margin-left:80px">
+                                    <img src={{items[category][i].image}}>
+                                </figure>
+                            </div>
+                            <div class="column is-one-half">
+                                <button class="button is-primary is-inverted is-medium is-centered" style="white-space:normal;margin-top:20px;width:500px;height:auto;">
+                                    <a href="{{url_for('item', product_id=items[category][i].product_id)}}">
+                                        {{items[category][i].item_name}}
+                                    </a>
+                                </button>
+                                <p class="title is-6" style="margin-top:5px;">
+                                    Sold by:
+                                    <span class="tag">
+                                        {{items[category][i].seller_username}}
+                                    </span>
+                                </p>
+                                <p class="subtitle is-6">
+                                    Price:
+                                    <span class="tag">
+                                        ${{items[category][i].price}}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
