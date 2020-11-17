@@ -19,7 +19,7 @@
                 {% endfor %}
             </ul>
             <h2 class="subtitle">Subtotal ({{total_quantity}} item{{total_quantity|pluralize}}): ${{'%0.2f' % total_price}}</h2>
-            <h2 class="subtitle">Address:</h2>
+            <h2 class="subtitle">Address: {{address}}</h2>
             <h2 class="subtitle">Delivery Date:<p id ="date"> </p></h2>
 
             <script>
