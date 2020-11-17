@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, func
 
+import os
 import models
 import forms
 import sys
@@ -138,7 +139,7 @@ def wishlist_to_cart(product_id, seller_username):
     db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('cart'), code=307)
+    return redirect(url_for('wishlist'), code=307)
 
 # adds item to cart
 @app.route('/add_cart/product_id=<product_id>&seller_username=<seller_username>')
@@ -553,4 +554,5 @@ def pluralize(number, singular='', plural='s'):
     return singular if number == 1 else plural
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
