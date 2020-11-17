@@ -210,7 +210,7 @@ def checkout():
     total_quantity = 0
     for quantity in cart_quantities:
         total_quantity += quantity
-    return render_template('checkout.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
+    return render_template('checkout.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity, address=current_user.address)
 
 # deletes item from cart
 @app.route('/transaction_success/')

@@ -22,7 +22,7 @@ div.relative {
       <li>
         <hr>
         <img src={{items[order][item].image}} height="150" width="150"  style="float:left">
-        <p style="text-align:left"> <b>Item:</b> <a href="{{url_for('item', product_id=items[order][item].product_id)}}">{{items[order][item].item_name}}</a> </p>
+        <p class="relative"> <b>Item:</b> <a href="{{url_for('item', product_id=items[order][item].product_id)}}">{{items[order][item].item_name}}</a> </p>
         <br><p class="relative"> <b>Seller:</b> {{items[order][item].seller_username}} </p>
         <br><p class="relative"> <b>Condition:</b> {{items[order][item].condition}} </p>
         <br><p class="relative"> <b>Price:</b> ${{'%0.2f' % items[order][item].price}} </p>
