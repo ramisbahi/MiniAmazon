@@ -216,6 +216,34 @@ def order_history():
         items.append(currItems)
     return render_template('order_history.html', items=items, orders=orders)
 
+@app.route('/post-item', methods=['GET', 'POST'])
+@login_required
+def post_item():
+    form = forms.PostingFormFactory.form()
+    if form.validate_on_submit():
+        randomString = ''.join(random.choices(string.ascii_uppercase +
+                         string.digits, k = 30))
+        new_posting = models.Items()
+        new_posting.product_id = randomString
+        new_posting.seller_username = current_user.username
+        new_posting.category = form.category.data
+        new_posting.condition = form.condition.data
+        new_posting.item_name = form.item_name.data
+        new_posting.price = form.price.data
+        new_posting.quantity = form.quantity.data
+        new_posting.image = form.image.data
+        new_posting.description = form.description.data
+
+        db.session.add(new_posting)
+        db.session.commit()
+
+        current_user.is_seller = '1'
+
+        flash('Item posted successfully')
+        return redirect(url_for('home'), code=307)
+
+    return render_template('post_item.html', form=form)
+
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
     item = db.session.query(models.Items) \
