@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 {% block heading %}{% endblock %}
 {% block content %}
 
@@ -70,4 +70,3 @@
     {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
 
 {% endblock %}
-
