@@ -133,6 +133,13 @@ def wishlist():
         total_quantity += quantity
     return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
 
+@app.route('/wishlist_to_cart/product_id=<product_id>&seller_username=<seller_username>')
+def wishlist_to_cart(product_id, seller_username):
+    db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
+    db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
+    db.session.commit()
+    return redirect(url_for('cart'), code=307)
+
 # adds item to cart
 @app.route('/add_cart/product_id=<product_id>&seller_username=<seller_username>')
 def add_cart(product_id, seller_username):
