@@ -6,9 +6,9 @@ from urllib.request import urlopen
 import numpy as np
 
 
-category = 'Electronics' # change category to generate csv from meta_<category>.json
+category = 'Tools_and_Home_Improvement' # change category to generate csv from meta_<category>.json
 category_name = category
-category_name = 'Electronics' # custom name in "category" column
+category_name = 'Tools and Home Improvement' # custom name in "category" column
 
 
 data = []
