@@ -8,7 +8,7 @@
 {% for item in items %}
 <h2>Item Information: {{item.item_name}}</h2>
 <img src={{items[0].image}}>
-<p><a href="/add_cart/product_id={{item.product_id}}&seller_username={{item.seller_username}}&buyer_username={{buyer.username}}">Add to Cart</a> | <a href="/add_wishlist/product_id={{item.product_id}}&seller_username={{item.seller_username}}&buyer_username={{buyer.username}}">Add to Wishlist</a></p>
+<p><a href="/add_cart/product_id={{item.product_id}}&seller_username={{item.seller_username}}">Add to Cart</a> | <a href="/add_wishlist/product_id={{item.product_id}}&seller_username={{item.seller_username}}">Add to Wishlist</a></p>
 <p>Name: {{item.item_name}}</p>
 <p>Price: {{item.price}}</p>
 <p>Description: {{item.description}}</p>
