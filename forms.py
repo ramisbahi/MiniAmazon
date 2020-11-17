@@ -59,6 +59,19 @@ class ReviewFormFactory:
             comments = StringField(default='')
         return F()
 
+class PostingFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            item_name = StringField(default='')
+            category = SelectField(u'Category', choices=[('Appliances', 'Appliances'), ('Beauty', 'Beauty'), ('Cell Phones and Accessories', 'Cell Phones and Accessories'), ('Electronics', 'Electronics'), ('Fashion', 'Fashion'), ('Gift Cards', 'Gift Cards'), ('Industrial and Scientific', 'Industrial and Scientific'), ('Luxury Beauty', 'Luxury Beauty'), ('Office Products', 'Office Products'), ('Pantry', 'Pantry'), ('Software', 'Software'), ('Video Games','Video Games')])
+            condition = SelectField(u'Condition', choices=[('New', 'New'), ('Little Use', 'Little Use'), ('Used', 'Used'), ('Refurbished', 'Refurbished')])
+            price = FloatField()
+            quantity = IntegerField()
+            image = FileField(u'Image File')
+            description = StringField(default='')
+        return F()
+
 class SearchFormFactory:
     @staticmethod
     def form():
