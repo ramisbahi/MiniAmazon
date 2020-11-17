@@ -188,6 +188,23 @@ def cart():
         total_quantity += quantity
     return render_template('cart.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
 
+@app.route('/checkout')
+def checkout():
+    cart_items = db.session.query(models.incart)\
+        .filter(models.incart.buyer_username == current_user.username).all()
+    items = []
+
+    for cart_item in cart_items:
+        items.append(db.session.query(models.Items).filter(models.Items.product_id == cart_item.product_id).filter(models.Items.seller_username == cart_item.seller_username).one())
+
+    item_prices = [item.price for item in items]
+    cart_quantities = [cart_item.cart_quantity for cart_item in cart_items]
+    total_price = dot(item_prices, cart_quantities)
+    total_quantity = 0
+    for quantity in cart_quantities:
+        total_quantity += quantity
+    return render_template('checkout.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
+
 # deletes item from cart
 @app.route('/transaction_success/')
 def transaction_success():
