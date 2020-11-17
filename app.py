@@ -35,7 +35,7 @@ def load_user(user_id):
 
 
 
-categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
+categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Tools and Home Improvement', 'Video Games']
 
 @app.route('/')
 @login_required
@@ -156,7 +156,7 @@ def add_cart(product_id, seller_username):
     else: # not in cart already
         db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
-        return redirect(url_for('cart', username=current_user.username), code=307)
+        return redirect(url_for('cart'), code=307)
 
 # decreases quantity by 1 for item in cart
 @app.route('/subtract_quantity_cart/product_id=<product_id>&seller_username=<seller_username>')
@@ -175,14 +175,14 @@ def subtract_quantity_cart(product_id, seller_username):
 def add_quantity_cart(product_id, seller_username):
     db.session.execute('UPDATE incart SET cart_quantity = cart_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('cart', username=current_user.username), code=307)
+    return redirect(url_for('cart'), code=307)
 
 # deletes item from cart
 @app.route('/delete_cart/product_id=<product_id>&seller_username=<seller_username>')
 def delete_cart(product_id, seller_username):
     db.session.execute('DELETE FROM incart WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
-    return redirect(url_for('cart', username=current_user.username), code=307)
+    return redirect(url_for('cart'), code=307)
 
 # returns cart for user
 @app.route('/cart')
@@ -545,7 +545,7 @@ def return_item(product_id, seller_username, order_id):
     # check if already returned
     if item_inorder.date_returned:
         # TODO: notify
-        return redirect(url_for('order', username=current_user.username), code=307) # TODO: go back to order
+        return redirect(url_for('order-history'), code=307) # TODO: go back to order
 
     # change date_returned in inorder
     date_returned = datetime.date.today().strftime('%Y-%m-%d')
@@ -558,7 +558,7 @@ def return_item(product_id, seller_username, order_id):
     db.session.commit()
 
 
-    return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
+    return redirect(url_for('order-history'), code=307) # TODO: go back to order
 
 
 @app.route('/search', methods=['GET'])
