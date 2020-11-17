@@ -1,10 +1,52 @@
 {% extends 'base.html' %}
 {% block heading %}Buyer Information: {{buyer.username}}{% endblock %}
 {% block content %}
-<p>Name: {{buyer.name}}</p>
-<p>Address: {{buyer.address}}</p>
-<p>Bio: {{buyer.bio}}</p>
-</hr>
-<p><a href="{{url_for('edit_buyer', username=buyer.username)}}">Edit</a>
-    this information.</p>
+<div class="columns is-centered">
+    <div class="column is-white is-8">
+        <h3 class="title">Profile</h3>
+        <div class="box">
+            <div class="columns is-centered">
+                <div class="column is-one-third">
+                    <span class="icon is-large" style="margin:5px;">
+                        <i class="fas fa-user-circle fa-3x"></i>
+                    </span>
+                    <br>
+                    <span class="tag is-primary is-large" style="width:150px;margin:5px;">
+                        <strong>Name:</strong>
+                    </span>
+                    <br>
+                    <span class="tag is-primary is-large" style="width:150px;margin:5px;">
+                        <strong>Address:</strong>
+                    </span>
+                    <br>
+                    <span class="tag is-primary is-large" style="width:150px;margin:5px;">
+                        <strong>Bio:</strong>
+                    </span>
+                    <br>
+                </div>
+                <div class="column is-two-thirds">
+                    <span class="tag is-white is-large" style="height:48px;width:450px;margin:5px;">
+                        <p><em>User info</em></p>
+                    </span>
+                    <span class="tag is-light is-large" style="width:450px;margin:5px;">
+                        <p>{{buyer.name}}</p>
+                    </span>
+                    <span class="tag is-light is-large" style="width:450px;margin:5px;">
+                        <p>{{buyer.address}}</p>
+                    </span>
+                    <span class="tag is-light is-large margin-top" style="width:450px;height:150px;margin:5px;">
+                        <p>{{buyer.bio}}</p>
+                    </span>
+                    </hr>
+                    <button class="button is-medium is-info" style="width:450px;margin:10px;">
+                        <a href="{{url_for('edit_buyer', username=buyer.username)}}">
+                            Edit this information
+                        </a>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

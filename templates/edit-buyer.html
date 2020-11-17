@@ -1,35 +1,53 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 {% block heading %}Edit Buyer Information: {{buyer.username}}{% endblock %}
 {% block content %}
-<form action="{{url_for('edit_buyer', username=buyer.username)}}" method="POST">
-    {{form.csrf_token}}
-    <p>
-        Username: {{form.username}}
-        {% if form.username.errors %}
-    <ul>{% for error in form.username.errors %}<li>{{error}}</li>{% endfor %}</ul>
-    {% endif %}
-    </p>
-    <p>
-        Bio: {{form.bio}}
-        {% if form.bio.errors %}
-    <ul>{% for error in form.bio.errors %}<li>{{error}}</li>{% endfor %}</ul>
-    {% endif %}
-    </p>
-    <p>
-        Name: {{form.name}}
-        {% if form.name.errors %}
-    <ul>{% for error in form.name.errors %}<li>{{error}}</li>{% endfor %}</ul>
-    {% endif %}
-    </p>
-    <p>
-        Address: {{form.address}}
-        {% if form.address.errors %}
-    <ul>{% for error in form.address.errors %}<li>{{error}}</li>{% endfor %}</ul>
-    {% endif %}
-    </p>
-    <hr/>
-    <input type="reset" value="Reset"/>
-    <input type="submit" value="Submit"/>
-    {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
-</form>
+<div class="columns is-centered">
+    <div class="column is-6">
+        <h3 class="title">Profile</h3>
+        <div class="box">
+            <h3 class="title is-5 is-pulled-left">Edit info</h3>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="notification is-danger">
+                {{ messages[0] }}. Go to <a href="{{ url_for('login') }}">login page</a>.
+            </div>
+            {% endif %}
+            {% endwith %}
+            <form action="{{url_for('edit_buyer', username=buyer.username)}}" method="POST">
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-info is-medium" type="text" name="username" placeholder="Username" value="{{buyer.username}}" autofocus="" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-info is-medium" type="text" name="name" placeholder="Name" value="{{buyer.name}}" autofocus="" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-info is-medium" type="text" name="address" value="{{buyer.address}}" placeholder="Address" autofocus="" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <textarea class="textarea is-info is-medium" type="text" name="bio" placeholder="Bio">{{buyer.bio}}</textarea>
+                    </div>
+                </div>
+                <hr/>
+                <div class="buttons is-centered">
+                    <div class="control">
+                        <input class="button is-large is-fullwidth is-light" type="reset" value="Reset" style="width:150px;margin-right:10px;"/>
+                    </div>
+                    <div class="control">
+                        <input class="button is-large is-fullwidth is-primary" type="submit" value="Submit" style="width:150px;margin-left:10px;"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
