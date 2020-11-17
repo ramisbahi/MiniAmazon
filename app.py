@@ -12,6 +12,7 @@ from itsdangerous import URLSafeTimedSerializer
 import traceback
 import datetime
 import random
+import string
 
 #note - maiden default is "johnson"
 
@@ -222,33 +223,27 @@ def order_history():
 def post_item():
     form = forms.PostingFormFactory.form()
     if form.validate_on_submit():
-        if current_user.is_seller != '1':
-            flash('You must be a seller to post an item')
-            return redirect(url_for('post_item'))
+        randomString = ''.join(random.choices(string.ascii_uppercase +
+                         string.digits, k = 30))
+        new_posting = models.Items()
+        new_posting.product_id = randomString
+        new_posting.seller_username = current_user.username
+        new_posting.category = form.category.data
+        new_posting.condition = form.condition.data
+        new_posting.item_name = form.item_name.data
+        new_posting.price = form.price.data
+        new_posting.quantity = form.quantity.data
+        new_posting.image = form.image.data
+        new_posting.description = form.description.data
 
-        try:
-            randomString = ''.join(random.choices(string.ascii_uppercase +
-                             string.digits, k = 30))
-            new_posting = models.Items()
-            new_posting.product_id = randomString
+        db.session.add(new_posting)
+        db.session.commit()
 
-            new_posting.seller_username = current_user
-            new_posting.category = form.category.data
-            new_posting.condition = form.condition.data
-            new_posting.item_name = form.item_name.data
-            new_posting.price = form.price.data
-            new_posting.quantity = form.quantity.data
-            new_posting.image = form.image.data
-            new_posting.description = form.description.data
+        current_user.is_seller = '1'
 
-            db.session.execute('INSERT INTO items VALUES(:product_id, :seller_username, :category, :condition, :item_name, :price, :quantity, :image, :description)', dict(product_id=new_posting.product_id, seller_username=new_posting.seller_username, category=new_posting.category, condition=new_posting.condition, item_name=new_posting.item_name, price=new_posting.price, quantity=new_posting.quantity, image=new_posting.image, description=new_posting.description))
-            db.session.commit()
+        flash('Item posted successfully')
+        return redirect(url_for('home'), code=307)
 
-            flash('Item posted successfully')
-
-            return redirect(url_for('post_item'), code=307)
-        except BaseException as e:
-                form.errors['database'] = str(e)
     return render_template('post_item.html', form=form)
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
