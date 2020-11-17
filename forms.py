@@ -58,3 +58,10 @@ class ReviewFormFactory:
             item_rating = IntegerField(default=5)
             comments = StringField(default='')
         return F()
+
+class SearchFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            query = StringField(default='')
+        return F()

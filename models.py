@@ -58,6 +58,7 @@ class inorder(db.Model):
     seller_username = db.Column('seller_username', db.String(30), primary_key=True)
     order_id = db.Column('order_id', db.Integer(), primary_key = True)
     order_quantity = db.Column('order_quantity', db.Integer())
+    date_returned = db.Column('date_returned', db.Date())
 
 class incart(db.Model):
     __tablename__ = 'incart'
@@ -68,12 +69,11 @@ class incart(db.Model):
 
 class Orders(db.Model):
     __tablename__ = 'orders'
-    order_id = db.Column('order_id', db.Integer(), primary_key = True)
+    order_id = db.Column('order_id', db.Integer(), autoincrement=True, primary_key = True)
     buyer_username = db.Column('buyer_username', db.String(30))
-    tracking_num = db.Column('tracking_num', db.Integer())
+    tracking_num = db.Column('tracking_num', db.Integer(), autoincrement=True)
     date_returned = db.Column('date_returned', db.Date())
     date_ordered = db.Column('date_ordered', db.Date())
-    shipping_status = db.Column('shipping_status', db.String(30))
 
 class Reviews(db.Model):
     __tablename__ = 'reviews'

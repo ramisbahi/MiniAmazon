@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+{% block heading %}{% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="{{url_for('search')}}" method="POST">
+        {{form.csrf_token}}
+        <p>
+            New Search: {{form.query}}
+            {% if form.query.errors %}
+                <ul>{% for error in form.query.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <hr/>
+        <input type="reset" value="Reset"/>
+        <input type="submit" value="Submit"/>
+        {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+    </form>
+
+
+    <h1>Searched Items</h1>
+    <ul>
+        {% for item in items%}
+            <li><a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a></li>
+        {% endfor %}
+    </ul>
+    <hr/>
+{% endblock %}

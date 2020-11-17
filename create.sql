@@ -20,12 +20,11 @@ INSERT INTO Buyers VALUES('joshguo', FALSE, 'I am the man the myth the legend', 
 INSERT INTO Buyers VALUES('DonaldTrump', FALSE, 'I am the president', 'DJT', 'Swampman', 'White House');
 
 
-CREATE TABLE Orders(order_id INTEGER NOT NULL PRIMARY KEY,
+CREATE TABLE Orders(order_id SERIAL NOT NULL PRIMARY KEY,
                     buyer_username VARCHAR(30) NOT NULL REFERENCES Buyers(username),
-                    tracking_num INTEGER NOT NULL,
+                    tracking_num SERIAL NOT NULL,
                     date_returned DATE,
-                    date_ordered DATE NOT NULL,
-                    shipping_status VARCHAR(30) NOT NULL);
+                    date_ordered DATE NOT NULL);
 
 
 CREATE TABLE Items(product_id VARCHAR(30) NOT NULL, /*just changed to string*/
@@ -46,6 +45,7 @@ CREATE TABLE inorder(product_id VARCHAR(30) NOT NULL,
                     seller_username VARCHAR(30) NOT NULL,
                     order_id INTEGER NOT NULL REFERENCES Orders(order_id),
                     order_quantity INTEGER NOT NULL CHECK(order_quantity > 0),
+                    date_returned DATE,
                     PRIMARY KEY(product_id, seller_username, order_id),
                     FOREIGN KEY(product_id, seller_username) REFERENCES Items(product_id, seller_username));
 

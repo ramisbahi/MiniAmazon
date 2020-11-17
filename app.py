@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from itsdangerous import URLSafeTimedSerializer
 import traceback
+import datetime
 
 #note - maiden default is "johnson"
 
@@ -30,16 +31,16 @@ buyer = 'joshguo'
 categories = ['Appliances', 'Beauty', 'Cell Phones and Accessories', 'Electronics', 'Fashion', 'Gift Cards', 'Industrial and Scientific', 'Luxury Beauty', 'Office Products', 'Pantry', 'Software', 'Video Games']
 
 @app.route('/')
+@login_required
 def home():
     items = {}
-    username='joshguo'
     for category in categories:
         items[category] = db.session.query(models.Items).filter(models.Items.category == category).limit(10).all()
     cart = db.session.query(models.incart)\
-        .filter(models.incart.buyer_username == username).all()
+        .filter(models.incart.buyer_username == current_user.username).all()
     if (cart is None):
         flash('Cart is empty!')
-    return render_template('all-items.html', items=items)
+    return render_template('all-items.html', items=items, form=forms.SearchFormFactory.form())
 
 
 #def all_drinkers():
@@ -50,9 +51,10 @@ def home():
 @login_required
 def item(product_id):
     items = db.session.query(models.Items)\
-        .filter(models.Items.product_id == product_id).all()
+        .filter(models.Items.product_id == product_id).first()
     buyer = current_user
-    return render_template('item.html', items=items, buyer=buyer)
+    return render_template('item.html', items=[items], buyer=buyer)
+
 
 # adds item to wishlist
 @app.route('/add_wishlist/product_id=<product_id>&seller_username=<seller_username>&buyer_username=<buyer_username>')
@@ -173,12 +175,12 @@ def transaction_success():
     items = db.session.query(models.Items).all()
     db.session.execute('DELETE FROM incart')
     db.session.commit()
-    return render_template('all-items.html', items=items)
+    return render_template('all-items.html', items=items, form=forms.SearchFormFactory.form())
 
 @app.route('/item/<product_id>/reviews', methods=['GET', 'POST'])
 def review(product_id):
     item = db.session.query(models.Items) \
-        .filter(models.Items.product_id == product_id).one()
+        .filter(models.Items.product_id == product_id).first()
 
     reviews = db.session.query(models.Reviews) \
         .filter(models.Reviews.product_id == product_id) \
@@ -382,6 +384,70 @@ def register_post():
     db.session.add(new_buyer)
     db.session.commit()
     return redirect(url_for('login'))
+
+
+@app.route('/tracking/<tracking_num>')
+def tracking(tracking_num):
+    order = db.session.query(models.Orders).filter(models.Orders.tracking_num == tracking_num).one()
+
+
+
+    status = "Processing"
+    delta = datetime.date.today() - order.date_ordered
+    if delta.days > 2:
+        status = "Delivered"
+    elif delta.days > 0:
+        status = "Shipped"
+
+    if order.date_returned:
+        status = "Returned"
+
+    return render_template('tracking.html', status=status, order=order)
+
+@app.route('/return_item/product_id=<product_id>&seller_username=<seller_username>&order_id=<order_id>')
+def return_item(product_id, seller_username, order_id):
+    item_inorder = db.session.query(models.inorder).filter(models.inorder.product_id == product_id).filter(models.inorder.seller_username == seller_username).filter(models.inorder.order_id == order_id).one()
+    # check if already returned
+    if item_inorder.date_returned:
+        # TODO: notify
+        return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
+
+    # change date_returned in inorder
+    date_returned = datetime.date.today().strftime('%Y-%m-%d')
+    db.session.execute('UPDATE inorder SET date_returned=:date_returned WHERE product_id=:product_id AND seller_username=:seller_username AND order_id=:order_id', dict(date_returned=date_returned, product_id=product_id, seller_username=seller_username, order_id=order_id))
+
+    # increase quantity of item with product_id and seller_username by order_quantity
+    additional_quantity = item_inorder.order_quantity
+    db.session.execute('UPDATE Items SET quantity=quantity+:additional_quantity WHERE product_id=:product_id AND seller_username=:seller_username', dict(additional_quantity=additional_quantity, product_id=product_id, seller_username=seller_username))
+
+    db.session.commit()
+
+
+    return redirect(url_for('order', username=buyer_username), code=307) # TODO: go back to order
+
+
+@app.route('/search', methods=['GET'])
+def search_page(items):
+    return render_template('search-items.html', items=items, form=form)
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    items = []
+
+    form = forms.SearchFormFactory.form()
+    if form.validate_on_submit():
+        try:
+            items = db.session.query(models.Items) \
+                .filter(models.Items.item_name.like('%{}%'.format(form.query.data))).limit(10).all()
+
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return redirect(url_for('home'))
+
+    return render_template('search-items.html', items=items, form=form)
+
+
 
 
 @app.template_filter('pluralize')
