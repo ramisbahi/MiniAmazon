@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField
+from wtforms import StringField, BooleanField, IntegerField, SelectField, FloatField, FileField
 from wtforms.validators import DataRequired
 
 class DrinkerEditFormFactory:
@@ -65,7 +65,7 @@ class PostingFormFactory:
         class F(FlaskForm):
             item_name = StringField(default='')
             category = SelectField(u'Category', choices=[('Appliances', 'Appliances'), ('Beauty', 'Beauty'), ('Cell Phones and Accessories', 'Cell Phones and Accessories'), ('Electronics', 'Electronics'), ('Fashion', 'Fashion'), ('Gift Cards', 'Gift Cards'), ('Industrial and Scientific', 'Industrial and Scientific'), ('Luxury Beauty', 'Luxury Beauty'), ('Office Products', 'Office Products'), ('Pantry', 'Pantry'), ('Software', 'Software'), ('Video Games','Video Games')])
-            condition = SelectField(u'Condition', choices=[('New', 'New'), ('Little Use', 'Little Use'), ('Used', 'Used'), ('Refurbished', 'Refurbished')])
+            condition = SelectField(u'Condition', choices=[('New', 'New'), ('Used - Like New', 'Used - Like New'), ('Used - Very Good', 'Used - Very Good'), ('Used - Good', 'Used - Good'), ('Used - Acceptable', 'Used - Acceptable')])
             price = FloatField()
             quantity = IntegerField()
             image = FileField(u'Image File')

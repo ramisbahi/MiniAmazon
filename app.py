@@ -11,6 +11,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from itsdangerous import URLSafeTimedSerializer
 import traceback
 import datetime
+import random
+import string
 
 #note - maiden default is "johnson"
 
@@ -240,7 +242,6 @@ def post_item():
         current_user.is_seller = '1'
 
         flash('Item posted successfully')
-        return redirect(url_for('home'), code=307)
 
     return render_template('post_item.html', form=form)
 
