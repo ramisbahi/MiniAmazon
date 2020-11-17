@@ -328,7 +328,7 @@ def profile():
 @app.route('/edit-buyer', methods=['GET', 'POST'])
 @login_required
 def edit_buyer():
-    form = forms.BuyerEditFormFactory.form(buyer)
+    form = forms.BuyerEditFormFactory.form(current_user)
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
