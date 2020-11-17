@@ -137,7 +137,7 @@ def wishlist():
     total_quantity = 0
     for quantity in wishlist_quantities:
         total_quantity += quantity
-    return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
+    return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, current_user=current_user, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
 
 
 @app.route('/wishlist_to_cart/product_id=<product_id>&seller_username=<seller_username>')
