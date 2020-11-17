@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, func
 
+import os
 import models
 import forms
 import sys
@@ -75,10 +76,12 @@ def home():
 #    return render_template('all-drinkers.html', drinkers=drinkers)
 
 @app.route('/item/<product_id>')
+@login_required
 def item(product_id):
     items = db.session.query(models.Items)\
         .filter(models.Items.product_id == product_id).first()
     return render_template('item.html', items=[items])
+
 
 # adds item to wishlist
 @app.route('/add_wishlist/product_id=<product_id>&seller_username=<seller_username>')
@@ -119,6 +122,7 @@ def delete_wishlist(product_id, seller_username):
 
 # returns wishlist for user
 @app.route('/wishlist')
+@login_required
 def wishlist():
     wishlist_items = db.session.query(models.inwishlist)\
         .filter(models.inwishlist.buyer_username == current_user.username).all()
@@ -134,6 +138,14 @@ def wishlist():
     for quantity in wishlist_quantities:
         total_quantity += quantity
     return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
+
+
+@app.route('/wishlist_to_cart/product_id=<product_id>&seller_username=<seller_username>')
+def wishlist_to_cart(product_id, seller_username):
+    db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
+    db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
+    db.session.commit()
+    return redirect(url_for('wishlist'), code=307)
 
 # adds item to cart
 @app.route('/add_cart/product_id=<product_id>&seller_username=<seller_username>')
@@ -189,6 +201,23 @@ def cart():
     for quantity in cart_quantities:
         total_quantity += quantity
     return render_template('cart.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
+
+@app.route('/checkout')
+def checkout():
+    cart_items = db.session.query(models.incart)\
+        .filter(models.incart.buyer_username == current_user.username).all()
+    items = []
+
+    for cart_item in cart_items:
+        items.append(db.session.query(models.Items).filter(models.Items.product_id == cart_item.product_id).filter(models.Items.seller_username == cart_item.seller_username).one())
+
+    item_prices = [item.price for item in items]
+    cart_quantities = [cart_item.cart_quantity for cart_item in cart_items]
+    total_price = dot(item_prices, cart_quantities)
+    total_quantity = 0
+    for quantity in cart_quantities:
+        total_quantity += quantity
+    return render_template('checkout.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity, address=current_user.address)
 
 # deletes item from cart
 @app.route('/transaction_success/')
@@ -561,4 +590,5 @@ def pluralize(number, singular='', plural='s'):
     return singular if number == 1 else plural
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
