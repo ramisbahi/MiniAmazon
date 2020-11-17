@@ -22,7 +22,7 @@
 <p>Subtotal ({{total_quantity}} item{{total_quantity|pluralize}}): ${{total_price}}</p>
 
 <p>
-  <a href="{{url_for('transaction_success')}}">Checkout</a>
+  <a href="{{url_for('transaction_success', buyer_username = username)}}">Checkout</a>
   </p>
 
 {% endblock %}

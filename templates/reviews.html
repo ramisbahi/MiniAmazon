@@ -1,10 +1,26 @@
 {% extends 'layout.html' %}
-{% block heading %}All Reviews for {{item.item_name}}{% endblock %}
+{% block heading %}{% endblock %}
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h2>All Reviews for {{item.item_name}}</h2>
+
     <ul>
         {% for review in reviews %}
             <li>{{review.item_rating}} stars</li>
             <li>Comment: {{review.comments}}</li>
+            <li>By: {{review.buyer_username}}</li>
             <br />
         {% endfor %}
     </ul>
