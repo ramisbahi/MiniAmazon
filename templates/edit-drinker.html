@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 {% block heading %}Edit Drinker Information: {{drinker.name}}{% endblock %}
 {% block content %}
 <form action="{{url_for('edit_drinker')}}" method="POST">

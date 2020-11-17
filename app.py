@@ -14,6 +14,8 @@ import traceback
 import datetime
 import random
 import string
+import urllib.request
+
 
 #note - maiden default is "johnson"
 
@@ -137,6 +139,7 @@ def wishlist():
         total_quantity += quantity
     return render_template('wishlist.html', wishlist_items=wishlist_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity)
 
+
 @app.route('/wishlist_to_cart/product_id=<product_id>&seller_username=<seller_username>')
 def wishlist_to_cart(product_id, seller_username):
     db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
@@ -163,7 +166,7 @@ def subtract_quantity_cart(product_id, seller_username):
     if currQuantity >= 2:
         db.session.execute('UPDATE incart SET cart_quantity = cart_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
-        return redirect(url_for('cart'), code=307)
+        return redirect(url_for('cart', username=current_user.username), code=307)
     else: # delete item if only 1
         return redirect(url_for('delete_cart', product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
 
@@ -246,6 +249,35 @@ def order_history():
         items.append(currItems)
     return render_template('order_history.html', items=items, orders=orders)
 
+@app.route('/sales-history', methods=['GET', 'POST'])
+@login_required
+def sales_history():
+    items = []
+    itemsSold = db.session.query(models.Items).filter(models.Items.seller_username == current_user.seller_username).all()
+    orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == current_user.username).all()
+    for order in orders:
+        currItems = []
+        itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).filter(models.inorder.seller_username==current_user.username).all()
+        for item in itemList:
+            itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
+            currItems.append(itemInfo)
+        items.append(currItems)
+    return render_template('sales_history.html', items=items, orders=orders)
+
+@app.route('/edit-item', methods=['GET', 'POST'])
+@login_required
+def edit_item(item):
+    form = forms.ItemEditFormFactory.form(item)
+    if form.validate_on_submit():
+        form.errors.pop('database', None)
+        db.session.edit(item.product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, form.image.data, form.description.data)
+        db.session.commit()
+
+        flash('Item been modified successfully')
+        return redirect(url_for('home'), code=307)
+
+    return render_template('edit-item.html', form=form)
+
 @app.route('/post-item', methods=['GET', 'POST'])
 @login_required
 def post_item():
@@ -270,6 +302,7 @@ def post_item():
         current_user.is_seller = '1'
 
         flash('Item posted successfully')
+        return redirect(url_for('home'), code=307)
 
     return render_template('post_item.html', form=form)
 

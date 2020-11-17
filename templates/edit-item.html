@@ -1,10 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block heading %}{% endblock %}
+{% block content %}
 
-</body>
-</html>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+    <h2>Edit Item</h2>
+
+    <hr/>
+    <form action="{{url_for('edit_item')}}" method="POST">
+        {{form.csrf_token}}
+        <p>
+            Item Name: {{form.item_name}}
+            {% if form.item_name.errors %}
+                <ul>{% for error in form.item_name.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            Category: {{form.category}}
+            {% if form.category.errors %}
+                <ul>{% for error in form.category.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            Condition: {{form.condition}}
+            {% if form.condition.errors %}
+                <ul>{% for error in form.condition.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            Price: {{form.price}}
+            {% if form.price.errors %}
+                <ul>{% for error in form.price.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            Quantity: {{form.quantity}}
+            {% if form.quantity.errors %}
+                <ul>{% for error in form.quantity.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            Image: {{form.image}}
+            {% if form.image.errors %}
+                <ul>{% for error in form.image.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <p>
+            Description: {{form.description}}
+            {% if form.description.errors %}
+                <ul>{% for error in form.description.errors %}<li>{{error}}</li>{% endfor %}</ul>
+            {% endif %}
+        </p>
+        <hr/>
+        <input type="reset" value="Reset"/>
+        <input type="submit" value="Submit"/>
+        {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+    </form>
+    {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+
+{% endblock %}
