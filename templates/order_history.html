@@ -1,6 +1,8 @@
-{% extends 'layout.html' %}
+{% extends "base.html" %}
 {% block heading %}Order History{% endblock %}
 {% block content %}
+<h3 class="title">Order History</h3>
+
 <ul>
   {% for order in range(0, orders|length)%}
     <h1> Order ID: {{orders[order].order_id}} </h1>
@@ -8,16 +10,17 @@
       <p> <a href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">Tracking Number: {{orders[order].tracking_num}}</a></p>
     </li>
 
-
+   <div class="box">
     {% for item in range(0, items[order]|length)%}
       <li>
         <p> Item: <a href="{{url_for('item', product_id=items[order][item].product_id)}}">{{items[order][item].item_name}}</a> </p>
         <p> Seller: {{items[order][item].seller_username}} </p>
         <p> Condition: {{items[order][item].condition}} </p>
-        <p> Price: {{items[order][item].price}} </p>
+        <p> Price: ${{'%0.2f' % items[order][item].price}} </p>
         <img src={{items[order][item].image}}>
       </li>
   {% endfor %}
+   </div>
   {% endfor %}
 </ul>
 <hr/>

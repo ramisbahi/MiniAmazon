@@ -1,22 +1,31 @@
-{% extends 'layout.html' %}
-{% block heading %}Wishlist{% endblock %}
+{% extends "base.html" %}
+{% block heading %}Cart{% endblock %}
 {% block content %}
-<ul>
-  {% for i in range(0, items|length)%}
-  <li><a href="{{url_for('item', product_id=items[i].product_id)}}">{{items[i].item_name}}</a> sold by {{items[i].seller_username}} - Quantity: {{wishlist_items[i].wishlist_quantity}}
-   - PRICE: ${{'%0.2f' % items[i].price}}
-    <a href="{{url_for('subtract_quantity_wishlist', product_id=items[i].product_id, seller_username=items[i].seller_username, buyer_username=username)}}">
-      <button type="button">-</button>
-    </a>
-    <a href="{{url_for('add_quantity_wishlist', product_id=items[i].product_id, seller_username=items[i].seller_username, buyer_username=username)}}">
-      <button type="button">+</button>
-    </a>
-    <a href="{{url_for('delete_wishlist', product_id=items[i].product_id, seller_username=items[i].seller_username, buyer_username=username)}}">
-      <button type="button">DELETE</button>
-    </a>
-  </li>
-  {% endfor %}
-</ul>
-<hr/>
-<p>Subtotal ({{total_quantity}} item{{total_quantity|pluralize}}): ${{total_price}}</p>
+
+
+<div class="columns is-centered">
+    <div class="column is-5">
+        <h3 class="title">Wishlist</h3>
+        <div class="box">
+
+            <ul>
+                {% for i in range(0, items|length)%}
+                <li><a href="{{url_for('item', product_id=items[i].product_id)}}">
+                    <img src={{items[i].image}} height="100" width="120"  style="float:left">
+                    <b>{{items[i].item_name}}</b></a> <br>Sold by {{items[i].seller_username}} <br>
+                    <br> PRICE: ${{'%0.2f' % items[i].price}}
+                    <br> <button class="button is-warning is-small is-pulled-right">Add to Cart</button>
+                    <hr>
+                </li>
+                {% endfor %}
+            </ul>
+
+
+        </div>
+        <a class="button is-link is-large" href="{{url_for('cart', buyer_username = username)}}">
+            View Cart
+        </a>
+
+    </div>
+</div>
 {% endblock %}
