@@ -68,7 +68,7 @@ class PostingFormFactory:
             item_name = StringField(default='')
             category = SelectField(u'Category', choices=[('Appliances', 'Appliances'), ('Beauty', 'Beauty'), ('Cell Phones and Accessories', 'Cell Phones and Accessories'), ('Electronics', 'Electronics'), ('Fashion', 'Fashion'), ('Gift Cards', 'Gift Cards'), ('Industrial and Scientific', 'Industrial and Scientific'), ('Luxury Beauty', 'Luxury Beauty'), ('Office Products', 'Office Products'), ('Pantry', 'Pantry'), ('Software', 'Software'), ('Video Games','Video Games')])
             condition = SelectField(u'Condition', choices=[('New', 'New'), ('Little Use', 'Little Use'), ('Used', 'Used'), ('Refurbished', 'Refurbished')])
-            price = IntegerField()
+            price = FloatField()
             quantity = IntegerField()
             image = FileField(u'Image File')
             description = StringField(default='')
