@@ -14,7 +14,7 @@
                     <img src={{items[i].image}} height="100" width="120"  style="float:left">
                     <b>{{items[i].item_name}}</b></a> <br>Sold by {{items[i].seller_username}} <br>
                     <br> PRICE: ${{'%0.2f' % items[i].price}}
-                    <br> <button class="button is-warning is-small is-pulled-right">Add to Cart</button>
+                    <br> <a href="{{url_for('wishlist_to_cart', product_id=items[i].product_id, seller_username=items[i].seller_username)}}"><button class="button is-warning is-small is-pulled-right">Add to Cart</button></a>
                     <hr>
                 </li>
                 {% endfor %}
