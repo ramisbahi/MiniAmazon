@@ -34,10 +34,14 @@
             {% endfor %}
             </ul>
 
-            <p>Subtotal ({{total_quantity}} item{{total_quantity|pluralize}}): ${{total_price}}</p>
+            <h2 class="subtitle">Subtotal ({{total_quantity}} item{{total_quantity|pluralize}}): ${{'%0.2f' % total_price}}</h2>
+
+
+
+
 
         </div>
-        <a class="button is-link is-large" href="{{url_for('transaction_success', buyer_username = username)}}">
+        <a class="button is-link is-large" href="{{url_for('checkout', buyer_username = username)}}">
             Proceed to Checkout
         </a>
     </div>
