@@ -1,23 +1,31 @@
 {% extends "base.html" %}
 {% block heading %}Order History{% endblock %}
 {% block content %}
+<style>
+div.relative {
+  position: relative;
+  left: 30px;
+}
+</style>
 <h3 class="title">Order History</h3>
 
 <ul>
   {% for order in range(0, orders|length)%}
-    <h1> Order ID: {{orders[order].order_id}} </h1>
+  <div class="box">
+    <h1> <b>Order ID:</b> {{orders[order].order_id}} </h1>
     <li>
-      <p> <a href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">Tracking Number: {{orders[order].tracking_num}}</a></p>
+      <p> <a href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}"><b>Tracking Number:</b> {{orders[order].tracking_num}}</a></p>
     </li>
 
-   <div class="box">
+
     {% for item in range(0, items[order]|length)%}
       <li>
-        <p> Item: <a href="{{url_for('item', product_id=items[order][item].product_id)}}">{{items[order][item].item_name}}</a> </p>
-        <p> Seller: {{items[order][item].seller_username}} </p>
-        <p> Condition: {{items[order][item].condition}} </p>
-        <p> Price: ${{'%0.2f' % items[order][item].price}} </p>
-        <img src={{items[order][item].image}}>
+        <hr>
+        <img src={{items[order][item].image}} height="150" width="150"  style="float:left">
+        <p style="text-align:left"> <b>Item:</b> <a href="{{url_for('item', product_id=items[order][item].product_id)}}">{{items[order][item].item_name}}</a> </p>
+        <br><p class="relative"> <b>Seller:</b> {{items[order][item].seller_username}} </p>
+        <br><p class="relative"> <b>Condition:</b> {{items[order][item].condition}} </p>
+        <br><p class="relative"> <b>Price:</b> ${{'%0.2f' % items[order][item].price}} </p>
       </li>
   {% endfor %}
    </div>
