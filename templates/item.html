@@ -1,24 +1,83 @@
 {% extends 'base.html' %}
 {% block heading %}{% endblock %}
 {% block content %}
+<div class="columns is-centered">
+    <div class="column is-white is-8">
+        <div class="box">
+            <div class="columns">
+                <div class="column is-one-fifth">
+                    <figure class="image is-128x128">
+                        <img src="{{items[0].image}}" style="margin:12px;">
+                    </figure>
+                </div>
+                <div class="column is-four-fifths">
+                    <br>
+                    <span class="tag is-light is-large">
+                        <h4 class="title is-4">{{items[0].item_name}}</h4>
+                    </span>
 
+                    <h5 class="subtitle is-5">{{items[0].category}}</h5>
 
+                    <a href="{{url_for('review', product_id=items[0].product_id)}}">
+                        <button class="button is-light" style="width:200px;">
+                            <span class="icon">
+                                <i class="fas fa-comment-alt is-pulled-left" style="margin-right:40px;"></i>
+                            </span>
+                            Go to reviews
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <hr/>
+            {% for item in items %}
 
-<img src="{{items[0].image}}">
-<h2>Item: {{items[0].item_name}}</h2>
-<p>Category: {{items[0].category}}</p>
-<a href="{{url_for('review', product_id=items[0].product_id)}}">Reviews</a>
+            <div class="columns">
+                <div class="column is-two-thirds">
+                    <h5 class="title is-5">
+                        Seller:
+                        <a href="{{url_for('seller', username=item.seller_username)}}">
+                            <span class="tag is-light is-large">
+                                {{item.seller_username}}
+                            </span>
+                        </a>
+                    </h5>
 
-<br></br>
-{% for item in items %}
-
-<p>Seller: {{item.seller_username}}</p>
-<p>Price: {{item.price}}</p>
-<p>Description: {{item.description}}</p>
-<p>Condition: {{item.condition}}</p>
-<p><a href="/add_cart/product_id={{item.product_id}}&seller_username={{item.seller_username}}">Add to Cart</a> | <a href="/add_wishlist/product_id={{item.product_id}}&seller_username={{item.seller_username}}">Add to Wishlist</a></p>
-
-
-<br></br>
-{% endfor %}
+                    <h6 class="subtitle is-6">{{item.description}}</h6>
+                    <h6 class="subtitle is-6">
+                        Condition:
+                        <span class="tag is-light is-medium">
+                            {{item.condition}}
+                        </span>
+                    </h6>
+                </div>
+                <div class="column is-one-third">
+                    <h6 class="subtile is-6">
+                        Price:
+                        <span class="tag is-light">
+                            ${{item.price}}
+                        </span>
+                    </h6>
+                    <a href="/add_cart/product_id={{item.product_id}}&seller_username={{item.seller_username}}">
+                        <button class="button is-primary is-inverted" style="width:200px;margin-top:10px;">
+                            <span class="icon">
+                                <i class="fas fa-cart-plus is-pulled-left" style="margin-right:60px;"></i>
+                            </span>
+                            Add to Cart
+                        </button>
+                    </a>
+                    <a href="/add_wishlist/product_id={{item.product_id}}&seller_username={{item.seller_username}}">
+                        <button class="button is-success is-inverted" style="width:200px;margin-top:5px;">
+                            <span class="icon">
+                                <i class="fas fa-heart is-pulled-left" style="margin-right:30px;"></i>
+                            </span>
+                            Add to Wishlist
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <hr/>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}
