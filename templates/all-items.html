@@ -55,7 +55,9 @@
                         <p class="title is-6" style="margin-top:5px;">
                             Sold by:
                             <span class="tag">
-                                {{item.seller_username}}
+                                <a href="{{url_for('seller', username=item.seller_username)}}">
+                                    {{item.seller_username}}
+                                </a>
                             </span>
                         </p>
                         <p class="subtitle is-6">
@@ -91,7 +93,9 @@
                                 <p class="title is-6" style="margin-top:5px;">
                                     Sold by:
                                     <span class="tag">
-                                        {{items[category][i].seller_username}}
+                                        <a href="{{url_for('seller', username=items[category][i].seller_username)}}">
+                                            {{items[category][i].seller_username}}
+                                        </a>
                                     </span>
                                 </p>
                                 <p class="subtitle is-6">
