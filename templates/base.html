@@ -60,13 +60,20 @@
                                         | Cart
                                     </p>
                                 </a>
-                                <hr class="navbar-divider">
-                                <a class="navbar-item" href="{{url_for('logout')}}">
+                                <a class="navbar-item" href="{{url_for('sales_history')}}">
                                     <span class="icon">
-                                        <i class="fas fa-hand-peace is-pulled-left"></i>
+                                        <i class="fas fa-tags is-pulled-left"></i>
                                     </span>
                                     <p>
-                                        | Sign Out
+                                        | Sales
+                                    </p>
+                                </a>
+                                <a class="navbar-item" href="{{url_for('order_history')}}">
+                                    <span class="icon">
+                                        <i class="fas fa-gift is-pulled-left"></i>
+                                    </span>
+                                    <p>
+                                        | Orders
                                     </p>
                                 </a>
                             </div>
