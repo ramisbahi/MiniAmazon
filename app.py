@@ -264,7 +264,7 @@ def order_history():
 def sales_history():
     if not current_user.is_seller:
         return render_template('not_seller_sales_history.html')
-    itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).all()
+    itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).filter(models.Items.quantity > 0).all()
     itemsSold = db.session.query(models.inorder, models.Items, models.Orders).filter(models.inorder.seller_username == current_user.username)\
         .filter(models.inorder.order_id == models.Orders.order_id).filter(models.inorder.product_id == models.Items.product_id).all()
     return render_template('sales_history.html', itemsSelling=itemsSelling, itemsSold=itemsSold)
