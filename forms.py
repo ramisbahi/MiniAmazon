@@ -1,6 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField, SelectField, FloatField, FileField
+from flask_wtf.file import FileField
+from flask_uploads import UploadSet, configure_uploads, IMAGES, patch_request_class
+from wtforms import StringField, BooleanField, IntegerField, SelectField, FloatField
 from wtforms.validators import DataRequired
+from werkzeug.utils import secure_filename
 
 class DrinkerEditFormFactory:
     @staticmethod

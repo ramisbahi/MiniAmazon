@@ -15,6 +15,9 @@ import datetime
 import random
 import string
 import urllib.request
+import requests
+import base64
+import json
 
 
 #note - maiden default is "johnson"
@@ -252,21 +255,20 @@ def order_history():
 @app.route('/sales-history', methods=['GET', 'POST'])
 @login_required
 def sales_history():
-    items = []
-    itemsSold = db.session.query(models.Items).filter(models.Items.seller_username == current_user.seller_username).all()
-    orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == current_user.username).all()
-    for order in orders:
-        currItems = []
-        itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).filter(models.inorder.seller_username==current_user.username).all()
-        for item in itemList:
-            itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
-            currItems.append(itemInfo)
-        items.append(currItems)
-    return render_template('sales_history.html', items=items, orders=orders)
+    itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).filter(models.Items.quantity > 0).all()
+    inOrderSold = db.session.query(models.inorder).filter(models.inorder.seller_username == current_user.username).all()
+    itemsSold = []
+    orders = []
+    for inOrderItem in inOrderSold:
+        item = db.session.query(models.Items).filter(models.Items.product_id == inOrderItem.product_id).one()
+        itemsSold.append(item)
 
-@app.route('/edit-item', methods=['GET', 'POST'])
+    return render_template('sales_history.html', itemsSelling=itemsSelling, itemsSold=itemsSold)
+
+@app.route('/edit-item/<product_id>', methods=['GET', 'POST'])
 @login_required
-def edit_item(item):
+def edit_item(product_id):
+    item = db.session.query(models.Items).filter(models.Items.product_id == product_id).one()
     form = forms.ItemEditFormFactory.form(item)
     if form.validate_on_submit():
         form.errors.pop('database', None)
@@ -293,16 +295,26 @@ def post_item():
         new_posting.item_name = form.item_name.data
         new_posting.price = form.price.data
         new_posting.quantity = form.quantity.data
-        new_posting.image = form.image.data
         new_posting.description = form.description.data
 
+        image = request.files['image']
+        apiUrl = 'https://api.imgur.com/3/image'
+        b64_image = base64.standard_b64encode(image.read())
+        params = {'image' : b64_image}
+        headers = {'Authorization' : 'Client-ID 12aa250c79dba8d'}
+        #client_id = '12aa250c79dba8d'
+        #client_secret = '0e132c4d82850eda1d2a172903f5a85bcea10a0b'
+        response = requests.post(apiUrl, headers=headers, data=params)
+        result = json.loads(response.text)
+        new_posting.image = result['data']['link']
+        
         db.session.add(new_posting)
         db.session.commit()
 
         current_user.is_seller = '1'
 
         flash('Item posted successfully')
-        return redirect(url_for('home'), code=307)
+        return redirect(url_for('post_item'))
 
     return render_template('post_item.html', form=form)
 

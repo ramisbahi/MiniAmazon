@@ -2,20 +2,18 @@
 {% block heading %}Items Sold/Sales History{% endblock %}
 {% block content %}
 
-<h2> Items Currently Sold </h2>
-{% for item in range(0, itemsSold|length)%}
-  <p> Item: <a href="{{url_for('edit_item', item=itemsSold[item])}}">{{itemsSold.item_name}}</a> </p>
-
+<h2> Items Currently Selling </h2>
+{% for item in itemsSelling%}
+  <p> Item: <a href="{{url_for('edit_item', product_id=item.product_id)}}">{{item.item_name}}</a> </p>
+{% endfor %}
 <ul>
-    {% for order in range(0, orders|length)%}
-      {% for item in range(0, items[order]|length)%}
-    <li>
-        <p> Item: <a href="{{url_for('item', product_id=items[order][item].product_id)}}">{{items[order][item].item_name}}</a> </p>
-        <p> Condition: {{items[order][item].condition}} </p>
-        <p> Price: ${{'%0.2f' % items[order][item].price}} </p>
-        <img src={{items[order][item].image}}>
-    </li>
-    {% endfor %}
+    {% for item in itemsSold%}
+      <li>
+          <p> Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a> </p>
+          <p> Condition: {{item.condition}} </p>
+          <p> Price: ${{'%0.2f' % item.price}} </p>
+          <img src={{item.image}}>
+      </li>
     {% endfor %}
 </ul>
 <hr/>
