@@ -256,13 +256,8 @@ def order_history():
 @login_required
 def sales_history():
     itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).filter(models.Items.quantity > 0).all()
-    inOrderSold = db.session.query(models.inorder).filter(models.inorder.seller_username == current_user.username).all()
-    itemsSold = []
-    orders = []
-    for inOrderItem in inOrderSold:
-        item = db.session.query(models.Items).filter(models.Items.product_id == inOrderItem.product_id).one()
-        itemsSold.append(item)
-
+    itemsSold = db.session.query(models.inorder, models.Items, models.Orders).filter(models.inorder.seller_username == current_user.username)\
+        .filter(models.inorder.order_id == models.Orders.order_id).filter(models.inorder.product_id == models.Items.product_id).all()
     return render_template('sales_history.html', itemsSelling=itemsSelling, itemsSold=itemsSold)
 
 @app.route('/edit-item/<product_id>', methods=['GET', 'POST'])
@@ -307,7 +302,7 @@ def post_item():
         response = requests.post(apiUrl, headers=headers, data=params)
         result = json.loads(response.text)
         new_posting.image = result['data']['link']
-        
+
         db.session.add(new_posting)
         db.session.commit()
 

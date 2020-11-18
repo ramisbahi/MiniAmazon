@@ -2,18 +2,35 @@
 {% block heading %}Items Sold/Sales History{% endblock %}
 {% block content %}
 
-<h2> Items Currently Selling </h2>
+
+<h1> <strong>Items Currently Selling </strong></h1>
 {% for item in itemsSelling%}
-  <p> Item: <a href="{{url_for('edit_item', product_id=item.product_id)}}">{{item.item_name}}</a> </p>
+  <p> Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a>  
+  </p>
+  <p><a href="{{url_for('edit_item', product_id=item.product_id)}}">Edit</a></p>
+  <br></br>
 {% endfor %}
+
+<br></br>
+<br></br>
+
+<h1> <strong>Items Sold </strong></h1>
 <ul>
     {% for item in itemsSold%}
       <li>
-          <p> Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a> </p>
-          <p> Condition: {{item.condition}} </p>
-          <p> Price: ${{'%0.2f' % item.price}} </p>
-          <img src={{item.image}}>
+          <img src="{{item[1].image}}">
+          <p><a href="{{url_for('item', product_id=item[1].product_id)}}">{{item[1].item_name}}</a> </p>
+          <p> Bought by {{item[2].buyer_username}} </p>
+          <p> Quantity bought: {{item[0].order_quantity}} </p>
+          <p> Condition: {{item[1].condition}} </p>
+          <p> Price: ${{'%0.2f' % item[1].price}} </p>
+          <p> Order ID: {{item[2].order_id}}</p>
+          <p> Date ordered: {{item[2].date_ordered}}</p>
+          {% if item[0].date_returned %}
+          <p> Item was returned </p>
+          {% endif %}
       </li>
+      <br></br>
     {% endfor %}
 </ul>
 <hr/>
