@@ -93,4 +93,5 @@ class SearchFormFactory:
     def form():
         class F(FlaskForm):
             query = StringField(default='')
+            category = StringField(default='All')
         return F()
