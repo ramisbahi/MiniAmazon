@@ -82,8 +82,8 @@ def home():
 @login_required
 def item(product_id):
     items = db.session.query(models.Items)\
-        .filter(models.Items.product_id == product_id).first()
-    return render_template('item.html', items=[items])
+        .filter(models.Items.product_id == product_id).filter(models.Items.quantity > 0).all()
+    return render_template('item.html', items=items)
 
 
 # adds item to wishlist
@@ -223,7 +223,7 @@ def checkout():
     return render_template('checkout.html', cart_items=cart_items, items=items, username=current_user.username, total_price=total_price, total_quantity=total_quantity, address=current_user.address)
 
 # deletes item from cart
-@app.route('/transaction_success/')
+@app.route('/transaction_success')
 def transaction_success():
     items = db.session.query(models.Items)
     cart_items = db.session.query(models.incart)\
@@ -232,6 +232,12 @@ def transaction_success():
     db.session.execute('INSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=current_user.username, date_bought=date))
     for cart_item in cart_items:
         orderID = db.session.query(func.max(models.Orders.order_id)).scalar()
+        # decrement number of items below
+        try:
+            db.session.execute('UPDATE items SET quantity=quantity-:order_quantity WHERE product_id=:product_id AND seller_username=:seller_username', dict(order_quantity=cart_item.cart_quantity, product_id=cart_item.product_id, seller_username=cart_item.seller_username))
+        except:
+            flash('Insufficient number of copies for this item. Please decrease order quantity or buy from other sellers.', 'error')
+            return redirect(url_for('cart'))
         db.session.execute('INSERT INTO inorder VALUES(:product_id, :seller_username, :order_id, :order_quantity)', dict(product_id=cart_item.product_id, seller_username=cart_item.seller_username, order_id=orderID, order_quantity=cart_item.cart_quantity))
     db.session.execute(('DELETE FROM incart WHERE buyer_username = :buyer_username'), dict(buyer_username=current_user.username))
     db.session.commit()
@@ -255,7 +261,9 @@ def order_history():
 @app.route('/sales-history', methods=['GET', 'POST'])
 @login_required
 def sales_history():
-    itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).filter(models.Items.quantity > 0).all()
+    if not current_user.is_seller:
+        return render_template('not_seller_sales_history.html')
+    itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).all()
     itemsSold = db.session.query(models.inorder, models.Items, models.Orders).filter(models.inorder.seller_username == current_user.username)\
         .filter(models.inorder.order_id == models.Orders.order_id).filter(models.inorder.product_id == models.Items.product_id).all()
     return render_template('sales_history.html', itemsSelling=itemsSelling, itemsSold=itemsSold)
@@ -304,6 +312,8 @@ def post_item():
         new_posting.image = result['data']['link']
 
         db.session.add(new_posting)
+        db.session.execute('UPDATE buyers SET is_seller=\'1\' WHERE username=:username', dict(username=current_user.username))
+
         db.session.commit()
 
         current_user.is_seller = '1'

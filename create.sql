@@ -32,7 +32,7 @@ CREATE TABLE Items(product_id VARCHAR(30) NOT NULL, /*just changed to string*/
                   condition VARCHAR(30), /*New, Used - Like New, Used - Very Good, Used - Good, Used - Acceptable*/
                   item_name VARCHAR(500) NOT NULL,
                   price DECIMAL(10,2) CHECK(price > 0),
-                  quantity INTEGER NOT NULL CHECK(quantity > 0),
+                  quantity INTEGER NOT NULL CHECK(quantity >= 0),
                   image VARCHAR(1000),
                   description VARCHAR(2000),
                   PRIMARY KEY(product_id, seller_username));

@@ -2,7 +2,18 @@
 {% block heading %}Cart{% endblock %}
 {% block content %}
 
-
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
 <div class="columns is-centered">
     <div class="column is-5">
@@ -36,7 +47,7 @@
 
 
         </div>
-        <a class="button is-link is-large" href="{{url_for('checkout', buyer_username = username)}}">
+        <a class="button is-link is-large" href="{{url_for('checkout')}}">
             Proceed to Checkout
         </a>
     </div>
