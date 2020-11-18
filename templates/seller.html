@@ -2,6 +2,11 @@
 {% block heading %}Seller Information: {{seller.username}}{% endblock %}
 {% block content %}
 <p>Seller: {{seller.name}}</p>
+{% if rating is number %}
+<p>Rating: {{'%0.2f' % rating}}</p>
+{% else %}
+<p>Seller has no ratings</p>
+{% endif %}
 <p>Address: {{seller.address}}</p>
 <p>Bio: {{seller.bio}}</p>
 <br></br>
@@ -13,7 +18,7 @@
 <ul>
     {% for item in items%}
       <p>Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a></p>
-      <p>Price: {{item.price}}</p>
+      <p>Price: ${{'%0.2f' % item.price}}</p>
       <p>Description: {{item.description}}</p>
       <p>Seller: {{item.seller_username}}</p>
       <p>Category: {{item.category}}</p>

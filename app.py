@@ -275,11 +275,27 @@ def edit_item(product_id):
     form = forms.ItemEditFormFactory.form(item)
     if form.validate_on_submit():
         form.errors.pop('database', None)
-        models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, form.image.data, form.description.data)
+
+        if (request.files['image']):
+            image = request.files['image']
+            apiUrl = 'https://api.imgur.com/3/image'
+            b64_image = base64.standard_b64encode(image.read())
+            params = {'image' : b64_image}
+            headers = {'Authorization' : 'Client-ID 12aa250c79dba8d'}
+            #client_id = '12aa250c79dba8d'
+            #client_secret = '0e132c4d82850eda1d2a172903f5a85bcea10a0b'
+            response = requests.post(apiUrl, headers=headers, data=params)
+            result = json.loads(response.text)
+            edit_posting = models.Items()
+            edit_posting.image = result['data']['link']
+            models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, edit_posting.image, form.description.data)
+        else:
+            models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, item.image, form.description.data)
 
         flash('Item been modified successfully')
-        return redirect(url_for('home'))
+        return redirect(url_for('sales_history'))
     return render_template('edit-item.html', item=item, form=form)
+
 
 @app.route('/post-item', methods=['GET', 'POST'])
 @login_required
@@ -392,37 +408,14 @@ def edit_buyer():
 # seller profiles, based on drinker profiles
 @app.route('/seller/<username>')
 def seller(username):
+    rating = db.session.execute('SELECT AVG(item_rating) FROM reviews WHERE seller_username=:seller_username', dict(seller_username=username)).first()[0]
+
     seller = db.session.query(models.Buyers)\
         .filter(models.Buyers.username == username).filter(models.Buyers.is_seller == '1').one()
     seller_items = db.session.query(models.Items)\
-        .filter(models.Items.seller_username == username).all()
-    return render_template('seller.html', seller=seller, items=seller_items)
+        .filter(models.Items.seller_username == username).filter(models.Items.quantity > 0).all()
+    return render_template('seller.html', seller=seller, items=seller_items, rating=rating)
 
-
-@app.route('/drinker/<name>')
-def drinker(name):
-    drinker = db.session.query(models.Drinker)\
-        .filter(models.Drinker.name == name).one()
-    return render_template('drinker.html', drinker=drinker)
-
-@app.route('/edit-drinker/<name>', methods=['GET', 'POST'])
-def edit_drinker(name):
-    drinker = db.session.query(models.Drinker)\
-        .filter(models.Drinker.name == name).one()
-    beers = db.session.query(models.Beer).all()
-    bars = db.session.query(models.Bar).all()
-    form = forms.DrinkerEditFormFactory.form(drinker, beers, bars)
-    if form.validate_on_submit():
-        try:
-            form.errors.pop('database', None)
-            models.Drinker.edit(name, form.name.data, form.address.data,
-                                form.get_beers_liked(), form.get_bars_frequented())
-            return redirect(url_for('drinker', name=form.name.data))
-        except BaseException as e:
-            form.errors['database'] = str(e)
-            return render_template('edit-drinker.html', drinker=drinker, form=form)
-    else:
-        return render_template('edit-drinker.html', drinker=drinker, form=form)
 
 @app.route('/login')
 def login():
