@@ -18,7 +18,7 @@
     <h2>Edit Item</h2>
 
     <hr/>
-    <form action="{{url_for('edit_item', product_id = item.product_id)}}" method="POST">
+    <form action="{{url_for('edit_item', product_id = item.product_id)}}" method="POST" enctype="multipart/form-data">
         {{form.csrf_token}}
         <p>
             Item Name: {{form.item_name}}

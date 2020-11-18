@@ -2,7 +2,11 @@
 {% block heading %}Seller Information: {{seller.username}}{% endblock %}
 {% block content %}
 <p>Seller: {{seller.name}}</p>
+{% if rating is number %}
 <p>Rating: {{'%0.2f' % rating}}</p>
+{% else %}
+<p>Seller has no ratings</p>
+{% endif %}
 <p>Address: {{seller.address}}</p>
 <p>Bio: {{seller.bio}}</p>
 <br></br>

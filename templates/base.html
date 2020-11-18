@@ -54,7 +54,7 @@
                                 </a>
                                 <a class="navbar-item" href="{{url_for('cart')}}">
                                     <span class="icon">
-                                        <i class="fas fa-cart-arrow-down is-pulled-left"></i>
+                                        <i class="fas fa-shopping-cart is-pulled-left"></i>
                                     </span>
                                     <p>
                                         | Cart
@@ -62,10 +62,18 @@
                                 </a>
                                 <a class="navbar-item" href="{{url_for('sales_history')}}">
                                     <span class="icon">
-                                        <i class="fas fa-tags is-pulled-left"></i>
+                                        <i class="fas fa-dollar-sign is-pulled-left"></i>
                                     </span>
                                     <p>
                                         | Sales
+                                    </p>
+                                </a>
+                                <a class="navbar-item" href="{{url_for('post_item')}}">
+                                    <span class="icon">
+                                        <i class="fas fa-headphones is-pulled-left"></i>
+                                    </span>
+                                    <p>
+                                        | Post Item
                                     </p>
                                 </a>
                                 <a class="navbar-item" href="{{url_for('order_history')}}">
