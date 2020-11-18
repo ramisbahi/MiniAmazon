@@ -15,23 +15,29 @@
     {% endif %}
 {% endwith %}
 
-<form action="{{url_for('search')}}" method="POST">
-    {{form.csrf_token}}
-    {{form.query}}
-    {% if form.query.errors %}
-            <ul>{% for error in form.query.errors %}<li>{{error}}</li>{% endfor %}</ul>
-        {% endif %}
-    </p>
-    <hr/>
-    <input type="reset" value="Reset"/>
-    <input type="submit" value="Submit"/>
-    {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
-</form>
-
 <div class="columns is-centered">
     <div class="column is-white is-9">
-        <div class="box">
+        <form action="{{url_for('search')}}" method="POST">
+            {{form.csrf_token}}
+            <div class="field">
+                <div class="control">
+                    <input class="input is-primary is-rounded is-fullwidth" type="text" name="query" placeholder="Search for items...">
+                </div>
+            </div>
+            <input class="button is-light" type="reset" value="Reset" style="margin-right:10px;margin-bottom:10px;width:100px;"/>
+            <input class="button is-primary" type="submit" value="Search" style="margin-left:10px;margin-bottom:10px;width:100px;"/>
+            {% if form.query.errors %}
+                <ul>
+                    {% for error in form.query.errors %}
+                        <li>{{error}}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+        </form>
             {% if recs %}
+            <div class="box">
                 <h4 class="title is-4">Recommended Items For You</h4>
                 {% for item in recs%}
                 <div class="columns">
