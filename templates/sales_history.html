@@ -1,13 +1,26 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block heading %}Items Sold/Sales History{% endblock %}
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
 
 
 <h1> <strong>Items Currently Selling </strong></h1>
 {% for item in itemsSelling%}
-  <p> Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a>  
+  <p> Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a>
   </p>
-  <p><a href="{{url_for('edit_item', product_id=item.product_id)}}">Edit</a></p>
+  <p><a href="{{url_for('edit_item', product_id=item.product_id)}}">Edit</a> <a href="{{url_for('delete_item', product_id=item.product_id)}}">Delete</a></p>
   <br></br>
 {% endfor %}
 
