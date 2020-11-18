@@ -47,6 +47,7 @@ def home():
     recs = []
     for category in categories:
         items[category] = db.session.query(models.Items).filter(models.Items.category == category).filter(models.Items.quantity > 0).limit(10).all()
+
     cart = db.session.query(models.incart)\
         .filter(models.incart.buyer_username == current_user.username).all()
     if (cart is None):
