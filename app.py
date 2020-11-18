@@ -268,6 +268,17 @@ def sales_history():
         .filter(models.inorder.order_id == models.Orders.order_id).filter(models.inorder.product_id == models.Items.product_id).all()
     return render_template('sales_history.html', itemsSelling=itemsSelling, itemsSold=itemsSold)
 
+@app.route('/delete-item/<product_id>', methods=['GET', 'POST'])
+@login_required
+def delete_item(product_id):
+    user = current_user.username
+    db.session.execute('UPDATE items SET quantity = 0 WHERE items.seller_username = :user and items.product_id = :product_id', dict(user=user, product_id=product_id))
+    db.session.commit()
+
+    flash('Item deleted successfully')
+    return redirect(url_for('sales_history'))
+
+
 @app.route('/edit-item/<product_id>', methods=['GET', 'POST'])
 @login_required
 def edit_item(product_id):
