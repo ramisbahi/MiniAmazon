@@ -1,39 +1,84 @@
 {% extends 'base.html' %}
 {% block heading %}{% endblock %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                    <span>{{ message }}</span>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
 
-    <form action="{{url_for('search')}}" method="POST">
-        {{form.csrf_token}}
-        <p>
-            New Search: {{form.query}}
-            {% if form.query.errors %}
-                <ul>{% for error in form.query.errors %}<li>{{error}}</li>{% endfor %}</ul>
-            {% endif %}
-        </p>
-        <hr/>
-        <input type="reset" value="Reset"/>
-        <input type="submit" value="Submit"/>
-        {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
-    </form>
-
-
-    <h1>Searched Items</h1>
-    <ul>
-        {% for item in items%}
-            <li><a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a></li>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         {% endfor %}
-    </ul>
-    <hr/>
+    {% endif %}
+{% endwith %}
+
+<div class="columns is-centered">
+    <div class="column is-white is-9">
+        <form action="{{url_for('search')}}" method="POST">
+            {{form.csrf_token}}
+            <div class="field">
+                <div class="control">
+                    <input class="input is-primary is-rounded is-fullwidth" type="text" name="query" placeholder="Search for items...">
+                </div>
+            </div>
+            <a href="{{url_for('home')}}">
+                <input class="button is-light" value="Reset" style="margin-right:10px;margin-bottom:10px;width:100px;"/>
+            </a>
+            <input class="button is-primary" type="submit" value="Search" style="margin-left:10px;margin-bottom:10px;width:100px;"/>
+            {% if form.query.errors %}
+            <ul>
+                {% for error in form.query.errors %}
+                <li>{{error}}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+        </form>
+
+        <div class="box">
+            <h4 class="title is-4">Searched Items</h4>
+            <ul>
+                {% for item in items%}
+                <li>
+                    <div class="columns">
+                        <div class="column is-one-third">
+                            <figure class="image is-128x128" style="margin-left:80px">
+                                <img src={{item.image}}>
+                            </figure>
+                        </div>
+                        <div class="column is-one-half">
+                            <button class="button is-primary is-inverted is-medium is-centered" style="white-space:normal;margin-top:20px;width:500px;height:auto;">
+                                <a href="{{url_for('item', product_id=item.product_id)}}">
+                                    {{item.item_name}}
+                                </a>
+                            </button>
+                            <p class="title is-6" style="margin-top:5px;">
+                                Sold by:
+                                <span class="tag">
+                                {{item.seller_username}}
+                            </span>
+                            </p>
+                            <p class="subtitle is-6">
+                                Price:
+                                <span class="tag">
+                                ${{item.price}}
+                            </span>
+                            </p>
+                        </div>
+                    </div>
+                    <hr>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <hr/>
+    </div>
+</div>
+
+
+
+
 {% endblock %}
