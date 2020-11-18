@@ -1,24 +1,21 @@
 {% extends "base.html" %}
 {% block heading %}Order History{% endblock %}
 {% block content %}
-<style>
-div.relative {
-  position: relative;
-  left: 0px;
-}
-</style>
+
 <h3 class="title">Order History</h3>
 <ul>
   {% for order in range(0, orders|length)%}
   <div class="box">
     <h1> <b>Order ID:</b> {{orders[order].order_id}} </h1>
     <li>
-      <p> <a href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">
         <b>Tracking Number:</b> {{orders[order].tracking_num}}</a></p>
     </li>
-    <p> <b> Address:</b> address</p>
-    <p> <b> Order Date:</b> order date</p>
-    <p> <b> Delivery Date: </b> delivery date</p>
+    <a class="button is-link is-large" href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">
+      Track Your Package!
+    </a>
+    <p> <b> Address:</b> {{address}}</p>
+    <p> <b> Order Date:</b> {{orders[order].date_ordered}}</p>
+    <p> <b> Delivery Date: </b> {{orders[order].date_ordered}}</p>
     {% for item in range(0, items[order]|length)%}
     <li>
       <hr>

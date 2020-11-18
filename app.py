@@ -256,8 +256,11 @@ def order_history():
             itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
             currItems.append(itemInfo)
         items.append(currItems)
+    orders.reverse()
+    items.reverse()
+    address = db.session.query(models.Buyers).filter(models.Buyers.username == current_user.username).one()
 
-    return render_template('order_history.html', items=items, orders=orders)
+    return render_template('order_history.html', items=items, orders=orders, address=address.address)
 
 @app.route('/sales-history', methods=['GET', 'POST'])
 @login_required
