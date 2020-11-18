@@ -275,13 +275,11 @@ def edit_item(product_id):
     form = forms.ItemEditFormFactory.form(item)
     if form.validate_on_submit():
         form.errors.pop('database', None)
-        db.session.edit(item.product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, form.image.data, form.description.data)
-        db.session.commit()
+        models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, form.image.data, form.description.data)
 
         flash('Item been modified successfully')
-        return redirect(url_for('home'), code=307)
-
-    return render_template('edit-item.html', form=form)
+        return redirect(url_for('home'))
+    return render_template('edit-item.html', item=item, form=form)
 
 @app.route('/post-item', methods=['GET', 'POST'])
 @login_required
