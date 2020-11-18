@@ -24,6 +24,17 @@
                     <input class="input is-primary is-rounded is-fullwidth" type="text" name="query" placeholder="Search for items...">
                 </div>
             </div>
+            <div class="field">
+                <div class="control">
+                    <input type="radio" id="all" name="category" value="All">
+                    <label for="all">All</label><br>
+
+                    {% for category in items %}
+                        <input type="radio" id="{{ category }}" name="category" value="{{ category }}">
+                        <label for="{{ category }}">{{ category }}</label><br>
+                    {% endfor %}
+                </div>
+            </div>
             <input class="button is-light" type="reset" value="Reset" style="margin-right:10px;margin-bottom:10px;width:100px;"/>
             <input class="button is-primary" type="submit" value="Search" style="margin-left:10px;margin-bottom:10px;width:100px;"/>
             {% if form.query.errors %}
@@ -55,7 +66,9 @@
                         <p class="title is-6" style="margin-top:5px;">
                             Sold by:
                             <span class="tag">
-                                {{item.seller_username}}
+                                <a href="{{url_for('seller', username=item.seller_username)}}">
+                                    {{item.seller_username}}
+                                </a>
                             </span>
                         </p>
                         <p class="subtitle is-6">
@@ -91,7 +104,9 @@
                                 <p class="title is-6" style="margin-top:5px;">
                                     Sold by:
                                     <span class="tag">
-                                        {{items[category][i].seller_username}}
+                                        <a href="{{url_for('seller', username=items[category][i].seller_username)}}">
+                                            {{items[category][i].seller_username}}
+                                        </a>
                                     </span>
                                 </p>
                                 <p class="subtitle is-6">

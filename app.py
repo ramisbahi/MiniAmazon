@@ -256,6 +256,7 @@ def order_history():
             itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
             currItems.append(itemInfo)
         items.append(currItems)
+
     return render_template('order_history.html', items=items, orders=orders)
 
 @app.route('/sales-history', methods=['GET', 'POST'])
@@ -581,8 +582,9 @@ def return_item(product_id, seller_username, order_id):
 
 
 @app.route('/search', methods=['GET'])
-def search_page(items):
-    return render_template('search-items.html', items=items, form=form)
+def search_page(items=None):
+    items = [] if items is None else items
+    return render_template('search-items.html', items=items, form=forms.SearchFormFactory.form(), categories=categories)
 
 
 @app.route('/search', methods=['POST'])
@@ -591,15 +593,24 @@ def search():
 
     form = forms.SearchFormFactory.form()
     if form.validate_on_submit():
+        print('###############')
+        print(form.category.data)
         try:
-            items = db.session.query(models.Items) \
-                .filter(models.Items.item_name.like('%{}%'.format(form.query.data))).limit(10).all()
+            if form.category.data == 'All' or form.category.data is None:
+                items = db.session.query(models.Items) \
+                    .filter(models.Items.item_name.like('%{}%'.format(form.query.data))).limit(10).all()
+            else:
+                items = db.session.query(models.Items) \
+                    .filter(models.Items.item_name.like('%{}%'.format(form.query.data))) \
+                    .filter(models.Items.category == form.category.data).limit(10).all()
+
+            print(items)
 
         except BaseException as e:
             form.errors['database'] = str(e)
             return redirect(url_for('home'))
 
-    return render_template('search-items.html', items=items, form=form)
+    return render_template('search-items.html', items=items, form=form, categories=categories)
 
 
 
