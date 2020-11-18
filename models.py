@@ -44,6 +44,15 @@ class Items(db.Model):
     quantity = db.Column('quantity', db.Integer())
     image = db.Column('image', db.String(1000))
     description = db.Column('description', db.String(2000))
+    def edit(product_id, seller_username, category, condition, item_name, price, quantity, image, description):
+            try:
+                db.session.execute('UPDATE items SET seller_username = :seller_username, category = :category, condition = :condition, item_name = :item_name, price = :price, quantity = :quantity, image = :image, description = :description'
+                                   ' WHERE product_id = :product_id',
+                                   dict(seller_username=seller_username, category=category, condition=condition, item_name=item_name, price=price, quantity=quantity, image=image, description=description, product_id=product_id))
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                raise e
 
 class inwishlist(db.Model):
     __tablename__ = 'inwishlist'
