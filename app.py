@@ -570,7 +570,8 @@ def return_item(product_id, seller_username, order_id):
 
 
 @app.route('/search', methods=['GET'])
-def search_page(items):
+def search_page(items=None):
+    items = [] if items is None else items
     return render_template('search-items.html', items=items, form=forms.SearchFormFactory.form(), categories=categories)
 
 
