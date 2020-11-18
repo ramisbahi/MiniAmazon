@@ -581,8 +581,6 @@ def search():
 
     form = forms.SearchFormFactory.form()
     if form.validate_on_submit():
-        print('###############')
-        print(form.category.data)
         try:
             if form.category.data == 'All' or form.category.data is None:
                 items = db.session.query(models.Items) \
@@ -591,8 +589,6 @@ def search():
                 items = db.session.query(models.Items) \
                     .filter(models.Items.item_name.like('%{}%'.format(form.query.data))) \
                     .filter(models.Items.category == form.category.data).limit(10).all()
-
-            print(items)
 
         except BaseException as e:
             form.errors['database'] = str(e)
