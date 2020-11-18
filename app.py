@@ -46,7 +46,7 @@ def home():
     items = {}
     recs = []
     for category in categories:
-        items[category] = db.session.query(models.Items).filter(models.Items.category == category).limit(10).all()
+        items[category] = db.session.query(models.Items).filter(models.Items.category == category).filter(models.Items.quantity > 0).limit(10).all()
     cart = db.session.query(models.incart)\
         .filter(models.incart.buyer_username == current_user.username).all()
     if (cart is None):
@@ -69,7 +69,7 @@ def home():
 
     # Get recommended products based on that first word
     recs = db.session.query(models.Items) \
-        .filter(models.Items.item_name.like('%{}%'.format(first_word))).limit(5).all() if first_word is not None else []
+        .filter(models.Items.item_name.like('%{}%'.format(first_word))).filter(models.Items.quantity > 0).limit(5).all() if first_word is not None else []
 
     return render_template('all-items.html', items=items, form=forms.SearchFormFactory.form(), recs=recs)
 
@@ -256,17 +256,32 @@ def order_history():
             itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
             currItems.append(itemInfo)
         items.append(currItems)
-    return render_template('order_history.html', items=items, orders=orders)
+    orders.reverse()
+    items.reverse()
+    address = db.session.query(models.Buyers).filter(models.Buyers.username == current_user.username).one()
+
+    return render_template('order_history.html', items=items, orders=orders, address=address.address)
 
 @app.route('/sales-history', methods=['GET', 'POST'])
 @login_required
 def sales_history():
     if not current_user.is_seller:
         return render_template('not_seller_sales_history.html')
-    itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).all()
+    itemsSelling = db.session.query(models.Items).filter(models.Items.seller_username == current_user.username).filter(models.Items.quantity > 0).all()
     itemsSold = db.session.query(models.inorder, models.Items, models.Orders).filter(models.inorder.seller_username == current_user.username)\
         .filter(models.inorder.order_id == models.Orders.order_id).filter(models.inorder.product_id == models.Items.product_id).all()
     return render_template('sales_history.html', itemsSelling=itemsSelling, itemsSold=itemsSold)
+
+@app.route('/delete-item/<product_id>', methods=['GET', 'POST'])
+@login_required
+def delete_item(product_id):
+    user = current_user.username
+    db.session.execute('UPDATE items SET quantity = 0 WHERE items.seller_username = :user and items.product_id = :product_id', dict(user=user, product_id=product_id))
+    db.session.commit()
+
+    flash('Item deleted successfully')
+    return redirect(url_for('sales_history'))
+
 
 @app.route('/edit-item/<product_id>', methods=['GET', 'POST'])
 @login_required
@@ -538,7 +553,7 @@ def tracking(tracking_num):
 
     status = "Processing"
     delta = datetime.date.today() - order.date_ordered
-    if delta.days > 2:
+    if delta.days > 2: # delivers after 3 days
         status = "Delivered"
     elif delta.days > 0:
         status = "Shipped"
@@ -552,8 +567,9 @@ def return_item(product_id, seller_username, order_id):
     item_inorder = db.session.query(models.inorder).filter(models.inorder.product_id == product_id).filter(models.inorder.seller_username == seller_username).filter(models.inorder.order_id == order_id).one()
     # check if already returned
     if item_inorder.date_returned:
-        # TODO: notify
-        return redirect(url_for('order-history'), code=307) # TODO: go back to order
+        # notify
+        flash('This item has already been returned', 'error')
+        return redirect(url_for('order-history'), code=307)
 
     # change date_returned in inorder
     date_returned = datetime.date.today().strftime('%Y-%m-%d')
@@ -566,7 +582,7 @@ def return_item(product_id, seller_username, order_id):
     db.session.commit()
 
 
-    return redirect(url_for('order-history'), code=307) # TODO: go back to order
+    return redirect(url_for('order-history'), code=307)
 
 
 @app.route('/search', methods=['GET'])
@@ -584,11 +600,11 @@ def search():
         try:
             if form.category.data == 'All' or form.category.data is None:
                 items = db.session.query(models.Items) \
-                    .filter(models.Items.item_name.like('%{}%'.format(form.query.data))).limit(10).all()
+                    .filter(models.Items.item_name.like('%{}%'.format(form.query.data))).filter(models.Items.quantity > 0).limit(10).all()
             else:
                 items = db.session.query(models.Items) \
                     .filter(models.Items.item_name.like('%{}%'.format(form.query.data))) \
-                    .filter(models.Items.category == form.category.data).limit(10).all()
+                    .filter(models.Items.category == form.category.data).filter(models.Items.quantity > 0).limit(10).all()
 
         except BaseException as e:
             form.errors['database'] = str(e)

@@ -25,9 +25,12 @@
                                         <strong>{{items[i].item_name}}</strong>
                                     </button>
                                 </a>
-                                <br>
+                                <hr/>
                                 <p class="title is-5">
-                                    Sold by <em>{{items[i].seller_username}}</em>
+                                    Sold by
+                                    <a href="{{url_for('seller', username=items[i].seller_username)}}">
+                                        <em>{{items[i].seller_username}}</em>
+                                    </a>
                                 </p>
                                 <p class="text">
                                     Quantity:
@@ -43,21 +46,12 @@
                             </div>
                             <div class="column is-one-quarter">
                                 <p class="buttons">
-                                    <a href="{{url_for('add_quantity_wishlist', product_id=items[i].product_id, seller_username=items[i].seller_username, buyer_username=username)}}">
-                                        <button class="button is-success is-inverted" style="width:200px;">
+                                    <a href="/add_cart/product_id={{items[i].product_id}}&seller_username={{items[i].seller_username}}">
+                                        <button class="button is-primary is-inverted" style="width:200px;margin-top:175px;">
                                             <span class="icon">
-                                                <i class="fas fa-plus is-pulled-left" style="margin-right:90px;"></i>
+                                                <i class="fas fa-cart-plus is-pulled-left" style="margin-right:75px;"></i>
                                             </span>
-                                            Add one
-                                        </button>
-                                    </a>
-                                    <br>
-                                    <a href="{{url_for('subtract_quantity_wishlist', product_id=items[i].product_id, seller_username=items[i].seller_username, buyer_username=username)}}">
-                                        <button class="button is-danger is-inverted" style="width:200px;">
-                                            <span class="icon">
-                                                <i class="fas fa-minus" style="margin-right:62px;"></i>
-                                            </span>
-                                            Remove one
+                                            Add to cart
                                         </button>
                                     </a>
                                     <br>
