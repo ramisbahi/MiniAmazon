@@ -394,37 +394,14 @@ def edit_buyer():
 # seller profiles, based on drinker profiles
 @app.route('/seller/<username>')
 def seller(username):
+    rating = db.session.execute('SELECT AVG(item_rating) FROM reviews WHERE seller_username=:seller_username', dict(seller_username=username)).first()[0]
+
     seller = db.session.query(models.Buyers)\
         .filter(models.Buyers.username == username).filter(models.Buyers.is_seller == '1').one()
     seller_items = db.session.query(models.Items)\
-        .filter(models.Items.seller_username == username).all()
-    return render_template('seller.html', seller=seller, items=seller_items)
+        .filter(models.Items.seller_username == username).filter(models.Items.quantity > 0).all()
+    return render_template('seller.html', seller=seller, items=seller_items, rating=rating)
 
-
-@app.route('/drinker/<name>')
-def drinker(name):
-    drinker = db.session.query(models.Drinker)\
-        .filter(models.Drinker.name == name).one()
-    return render_template('drinker.html', drinker=drinker)
-
-@app.route('/edit-drinker/<name>', methods=['GET', 'POST'])
-def edit_drinker(name):
-    drinker = db.session.query(models.Drinker)\
-        .filter(models.Drinker.name == name).one()
-    beers = db.session.query(models.Beer).all()
-    bars = db.session.query(models.Bar).all()
-    form = forms.DrinkerEditFormFactory.form(drinker, beers, bars)
-    if form.validate_on_submit():
-        try:
-            form.errors.pop('database', None)
-            models.Drinker.edit(name, form.name.data, form.address.data,
-                                form.get_beers_liked(), form.get_bars_frequented())
-            return redirect(url_for('drinker', name=form.name.data))
-        except BaseException as e:
-            form.errors['database'] = str(e)
-            return render_template('edit-drinker.html', drinker=drinker, form=form)
-    else:
-        return render_template('edit-drinker.html', drinker=drinker, form=form)
 
 @app.route('/login')
 def login():
