@@ -24,6 +24,17 @@
                     <input class="input is-primary is-rounded is-fullwidth" type="text" name="query" placeholder="Search for items...">
                 </div>
             </div>
+            <div class="field">
+                <div class="control">
+                    <input type="radio" id="all" name="category" value="All">
+                    <label for="all">All</label><br>
+
+                    {% for category in categories %}
+                        <input type="radio" id="{{ category }}" name="category" value="{{ category }}">
+                        <label for="{{ category }}">{{ category }}</label><br>
+                    {% endfor %}
+                </div>
+            </div>
             <a href="{{url_for('home')}}">
                 <input class="button is-light" value="Reset" style="margin-right:10px;margin-bottom:10px;width:100px;"/>
             </a>
