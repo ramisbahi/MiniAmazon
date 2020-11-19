@@ -13,32 +13,41 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+<h3 class="title">Sales</h3>
 
+<div class="box">
+    <h1 class="title is-5">Items Selling</h1>
+    {% for item in itemsSelling%}
+    <hr>
+    <p> <a href="{{url_for('item', product_id=item.product_id)}}"><h1 style="color:blue;"><u>{{item.item_name}}</u></h1></a>
+    </p>
+    <br>
+    <p>
+        <a class="button is-dark is-small" href="{{url_for('edit_item', product_id=item.product_id)}}">
+            Edit
+        </a>
+        <a class="button is-dark is-small" href="{{url_for('delete_item', product_id=item.product_id)}}">
+            Delete
+        </a>
+    </p>
+    <br>
+    {% endfor %}
+</div>
 
-
-<h1> <strong>Items Currently Selling </strong></h1>
-{% for item in itemsSelling%}
-  <p> Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a>
-  </p>
-  <p><a href="{{url_for('edit_item', product_id=item.product_id)}}">Edit</a> <a href="{{url_for('delete_item', product_id=item.product_id)}}">Delete</a></p>
-  <br></br>
-{% endfor %}
-
-<br></br>
-<br></br>
-
-<h1> <strong>Items Sold </strong></h1>
+<div class="box">
+<h5 class="title is-5">Items Sold</h5>
 <ul>
     {% for item in itemsSold%}
+    <hr>
       <li>
           <img src="{{item[1].image}}">
-          <p><a href="{{url_for('item', product_id=item[1].product_id)}}">{{item[1].item_name}}</a> </p>
-          <p> Bought by {{item[2].buyer_username}} </p>
-          <p> Quantity bought: {{item[0].order_quantity}} </p>
-          <p> Condition: {{item[1].condition}} </p>
-          <p> Price: ${{'%0.2f' % item[1].price}} </p>
-          <p> Order ID: {{item[2].order_id}}</p>
-          <p> Date ordered: {{item[2].date_ordered}}</p>
+          <p><a href="{{url_for('item', product_id=item[1].product_id)}}"><p style="color:blue;"><u>{{item[1].item_name}}</u></p></a> </p>
+          <p> <b>Bought by:</b> {{item[2].buyer_username}} </p>
+          <p> <b>Quantity bought:</b> {{item[0].order_quantity}} </p>
+          <p> <b>Condition:</b> {{item[1].condition}} </p>
+          <p> <b>Price:</b> ${{'%0.2f' % item[1].price}} </p>
+          <p> <b>Order ID:</b> {{item[2].order_id}}</p>
+          <p> <b>Date ordered:</b> {{item[2].date_ordered}}</p>
           {% if item[0].date_returned %}
           <p> Item was returned </p>
           {% endif %}
@@ -46,6 +55,7 @@
       <br></br>
     {% endfor %}
 </ul>
+</div>
 <hr/>
 
 {% endblock %}
