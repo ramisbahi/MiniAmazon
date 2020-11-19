@@ -604,9 +604,9 @@ def return_item(product_id, seller_username, order_id):
 
 
 @app.route('/search', methods=['GET'])
-def search_page(items=None):
+def search_page(items=None, category='All'):
     items = [] if items is None else items
-    return render_template('search-items.html', items=items, form=forms.SearchFormFactory.form(), categories=categories)
+    return render_template('search-items.html', items=items, form=forms.SearchFormFactory.form(), category=category)
 
 
 @app.route('/search', methods=['POST'])
@@ -628,7 +628,9 @@ def search():
             form.errors['database'] = str(e)
             return redirect(url_for('home'))
 
-    return render_template('search-items.html', items=items, form=form, categories=categories)
+    category = form.category.data if form.category.data is not None else 'All'
+
+    return render_template('search-items.html', items=items, form=form, category=category)
 
 
 

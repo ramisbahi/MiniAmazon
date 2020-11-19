@@ -18,19 +18,28 @@
 <div class="box">
     <h1 class="title is-5">Items Selling</h1>
     {% for item in itemsSelling%}
-    <hr>
-    <p> <a href="{{url_for('item', product_id=item.product_id)}}"><h1 style="color:blue;"><u>{{item.item_name}}</u></h1></a>
-    </p>
-    <br>
-    <p>
-        <a class="button is-dark is-small" href="{{url_for('edit_item', product_id=item.product_id)}}">
-            Edit
-        </a>
-        <a class="button is-dark is-small" href="{{url_for('delete_item', product_id=item.product_id)}}">
-            Delete
-        </a>
-    </p>
-    <br>
+
+        <hr>
+        <div class="columns">
+            <div class="column is-one-fifth"><img src={{item.image}} height="150" width="150"  style="float:right"></div>
+            <div class="column"><div class="box">
+                <p style="text-align:left"> <a href="{{url_for('item', product_id=item.product_id)}}"><h1 style="color:blue;"><u>{{item.item_name}}</u></h1></a><br><p style="text-align:left"> <b>Condition:</b> {{item.condition}} </p>
+                <br><p style="text-align:left"> <b>Description:</b> {{item.description}} </p>
+                <br><p style="text-align:left"> <b>Category:</b> {{item.category}} </p>
+                <br><p style="text-align:left"> <b>Condition:</b> {{item.condition}} </p>
+                <br><p style="text-align:left"> <b>Price:</b> ${{'%0.2f' % item.price}} </p>
+                <br><p style="text-align:left"> <b>Quantity:</b> {{item.quantity}} </p>
+                <br>
+                <a class="button is-dark is-small" href="{{url_for('edit_item', product_id=item.product_id)}}">
+                    Edit
+                </a>
+                <a class="button is-dark is-small" href="{{url_for('delete_item', product_id=item.product_id)}}">
+                    Delete
+                </a>
+            </div></div>
+        </div>
+
+
     {% endfor %}
 </div>
 
@@ -38,21 +47,28 @@
 <h5 class="title is-5">Items Sold</h5>
 <ul>
     {% for item in itemsSold%}
+
     <hr>
-      <li>
-          <img src="{{item[1].image}}">
-          <p><a href="{{url_for('item', product_id=item[1].product_id)}}"><p style="color:blue;"><u>{{item[1].item_name}}</u></p></a> </p>
-          <p> <b>Bought by:</b> {{item[2].buyer_username}} </p>
-          <p> <b>Quantity bought:</b> {{item[0].order_quantity}} </p>
-          <p> <b>Condition:</b> {{item[1].condition}} </p>
-          <p> <b>Price:</b> ${{'%0.2f' % item[1].price}} </p>
-          <p> <b>Order ID:</b> {{item[2].order_id}}</p>
-          <p> <b>Date ordered:</b> {{item[2].date_ordered}}</p>
-          {% if item[0].date_returned %}
-          <p> Item was returned </p>
-          {% endif %}
-      </li>
-      <br></br>
+    <div class="columns">
+        <div class="column is-one-fifth"><img src={{item[1].image}} height="150" width="150"  style="float:right"></div>
+        <div class="column"><div class="box">
+            <p style="text-align:left"><a href="{{url_for('item', product_id=item[1].product_id)}}"><p style="color:blue;"><u>{{item[1].item_name}}</u></p></a> </p>
+            <br><p style="text-align:left"> <b>Bought by:</b> {{item[2].buyer_username}} </p>
+            <br><p style="text-align:left"> <b>Quantity bought:</b> {{item[0].order_quantity}} </p>
+            <br><p style="text-align:left"> <b>Condition:</b> {{item[1].condition}}</p>
+            <br><p style="text-align:left"> <b>Price:</b> ${{'%0.2f' % item[1].price}} </p>
+            <br><p style="text-align:left"> <b>Order ID:</b> {{item[2].order_id}} </p>
+            <br><p style="text-align:left"><b>Date ordered:</b> {{item[2].date_ordered}} </p>
+            {% if item[0].date_returned %}
+            <p> Item was returned </p>
+            {% endif %}
+
+            <br>
+            <br>
+
+        </div></div>
+    </div>
+
     {% endfor %}
 </ul>
 </div>
