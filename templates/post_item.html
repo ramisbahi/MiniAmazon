@@ -29,17 +29,6 @@
                     </div>
                 </div>
 
-                <div class="field">
-                    <div class="control">
-                        <input class="input is-info is-medium" type="text" name="username" placeholder="Username*" autofocus="" required>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="control">
-                        <input class="input is-info is-medium" type="text" name="username" placeholder="Username*" autofocus="" required>
-                    </div>
-                </div>
                 <p>
                     Category: {{form.category}}
                     {% if form.category.errors %}
@@ -52,44 +41,39 @@
                 <ul>{% for error in form.condition.errors %}<li>{{error}}</li>{% endfor %}</ul>
                 {% endif %}
                 </p>
+                <br>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-info is-medium" type="float" name="price" placeholder="Price" autofocus="" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-info is-medium" type="integer" name="quantity" placeholder="Quantity" autofocus="" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <textarea class="input is-info is-medium" type="text" name="description" placeholder="Description" autofocus="" required></textarea>
+                    </div>
+                </div>
                 <p>
-                    Price: {{form.price}}
-                    {% if form.price.errors %}
-                <ul>{% for error in form.price.errors %}<li>{{error}}</li>{% endfor %}</ul>
-                {% endif %}
-                </p>
-                <p>
-                    Quantity: {{form.quantity}}
-                    {% if form.quantity.errors %}
-                <ul>{% for error in form.quantity.errors %}<li>{{error}}</li>{% endfor %}</ul>
-                {% endif %}
-                </p>
-                <p>
-                    Image: {{form.image}}
-                    {% if form.image.errors %}
+                Image: {{form.image}}
+                {% if form.image.errors %}
                 <ul>{% for error in form.image.errors %}<li>{{error}}</li>{% endfor %}</ul>
                 {% endif %}
                 </p>
-                <p>
-                    Description: {{form.description}}
-                    {% if form.description.errors %}
-                <ul>{% for error in form.description.errors %}<li>{{error}}</li>{% endfor %}</ul>
-                {% endif %}
-                </p>
                 <hr/>
-                <input type="reset" value="Reset"/>
-                <input type="submit" value="Submit"/>
+                <input class="button is-light is-medium" type="reset" value="Reset" style="margin-right:10px"/>
+                <input class="button is-primary is-medium" type="submit" value="Submit" style="margin-left:10px"/>
                 {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
             </form>
             {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
         </div>
     </div>
 </div>
-
-
-    <h2>Post an Item</h2>
-
-    <hr/>
-
 
 {% endblock %}
