@@ -241,7 +241,6 @@ def transaction_success():
         .filter(models.incart.buyer_username == current_user.username).all()
     date = str(datetime.date.today())
 
-    db.session.execute('CREATE TRIGGER checkBuyer BEFORE INSERT ON OINSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=current_user.username, date_bought=date))
     for cart_item in cart_items:
         orderID = db.session.query(func.max(models.Orders.order_id)).scalar()
         # decrement number of items below
