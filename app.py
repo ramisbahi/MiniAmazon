@@ -319,29 +319,32 @@ def delete_item(product_id):
 @app.route('/edit-item/<product_id>', methods=['GET', 'POST'])
 @login_required
 def edit_item(product_id):
-    item = db.session.query(models.Items).filter(models.Items.product_id == product_id).one()
-    form = forms.ItemEditFormFactory.form(item)
-    if form.validate_on_submit():
-        form.errors.pop('database', None)
+    try:
+        item = db.session.query(models.Items).filter(models.Items.product_id == product_id).filter(models.Items.seller_username == current_user.username).one()
+        form = forms.ItemEditFormFactory.form(item)
+        if form.validate_on_submit():
+            form.errors.pop('database', None)
 
-        if (request.files['image']):
-            image = request.files['image']
-            apiUrl = 'https://api.imgur.com/3/image'
-            b64_image = base64.standard_b64encode(image.read())
-            params = {'image' : b64_image}
-            headers = {'Authorization' : 'Client-ID 12aa250c79dba8d'}
-            #client_id = '12aa250c79dba8d'
-            #client_secret = '0e132c4d82850eda1d2a172903f5a85bcea10a0b'
-            response = requests.post(apiUrl, headers=headers, data=params)
-            result = json.loads(response.text)
-            edit_posting = models.Items()
-            edit_posting.image = result['data']['link']
-            models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, edit_posting.image, form.description.data)
-        else:
-            models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, item.image, form.description.data)
+            if (request.files['image']):
+                image = request.files['image']
+                apiUrl = 'https://api.imgur.com/3/image'
+                b64_image = base64.standard_b64encode(image.read())
+                params = {'image' : b64_image}
+                headers = {'Authorization' : 'Client-ID 12aa250c79dba8d'}
+                #client_id = '12aa250c79dba8d'
+                #client_secret = '0e132c4d82850eda1d2a172903f5a85bcea10a0b'
+                response = requests.post(apiUrl, headers=headers, data=params)
+                result = json.loads(response.text)
+                edit_posting = models.Items()
+                edit_posting.image = result['data']['link']
+                models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, edit_posting.image, form.description.data)
+            else:
+                models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, item.image, form.description.data)
 
-        flash('Item been modified successfully')
-        return redirect(url_for('sales_history'))
+                flash('Item been modified successfully')
+                return redirect(url_for('sales_history'))
+    except:
+        flash('You are not selling this item or this is not a valid item.')
     return render_template('edit-item.html', item=item, form=form)
 
 
@@ -442,21 +445,13 @@ def profile():
 @app.route('/edit-buyer', methods=['GET', 'POST'])
 @login_required
 def edit_buyer():
+
     form = forms.BuyerEditFormFactory.form(current_user)
 
     if form.validate_on_submit():
-        try:
-            form.errors.pop('database', None)
-            buyer = db.session.query(models.Buyers.username == current_user.username).one()
-            buyer.bio = form.bio.data
-            buyer.name = form.name.data
-            buyer.address = form.address.data
-            db.session.commit()
-            db.session.close()
-            return redirect(url_for('profile'))
-        except BaseException as e:
-            form.errors['database'] = str(e)
-            return render_template('edit-buyer.html', buyer=current_user, form=form)
+        form.errors.pop('database', None)
+        models.Buyers.edit(current_user.username, form.bio.data, form.name.data, form.address.data)
+        return redirect(url_for('profile'))
     return render_template('edit-buyer.html', buyer=current_user, form=form)
 
 # seller profiles, based on drinker profiles
