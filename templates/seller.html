@@ -31,7 +31,7 @@
                 </div>
                 <div class="column is-two-thirds">
                     <span class="tag is-white is-large" style="height:48px;width:450px;margin:5px;">
-                        <p><em>User info</em></p>
+                        <p><em>Seller info</em></p>
                     </span>
                     <span class="tag is-light is-large" style="width:450px;margin:5px;">
                         <p>{{seller.name}}</p>
@@ -41,7 +41,7 @@
                     </span>
                     <span class="tag is-light is-large" style="width:450px;margin:5px;">
                         {% if rating is number %}
-                        <p>{{'%0.2f' % rating}}</p>
+                        <p>{{'%0.2f' % rating}} / 5.00</p>
                         {% else %}
                         <p>Seller has no ratings</p>
                         {% endif %}

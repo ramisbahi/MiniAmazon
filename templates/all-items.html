@@ -26,13 +26,18 @@
             </div>
             <div class="field">
                 <div class="control">
-                    <input type="radio" id="all" name="category" value="All">
-                    <label for="all">All</label><br>
-
-                    {% for category in items %}
-                        <input type="radio" id="{{ category }}" name="category" value="{{ category }}">
-                        <label for="{{ category }}">{{ category }}</label><br>
-                    {% endfor %}
+                    <div class="select is-primary is-rounded">
+                        <select>
+                            <option name="category" value="All">
+                                All
+                            </option>
+                            {% for category in items %}
+                            <option name="category" value="{{ category }}">
+                                {{ category }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
             <input class="button is-light" type="reset" value="Reset" style="margin-right:10px;margin-bottom:10px;width:100px;"/>

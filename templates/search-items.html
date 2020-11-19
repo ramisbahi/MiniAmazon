@@ -26,13 +26,18 @@
             </div>
             <div class="field">
                 <div class="control">
-                    <input type="radio" id="all" name="category" value="All">
-                    <label for="all">All</label><br>
-
-                    {% for category in categories %}
-                        <input type="radio" id="{{ category }}" name="category" value="{{ category }}">
-                        <label for="{{ category }}">{{ category }}</label><br>
-                    {% endfor %}
+                    <div class="select is-primary is-rounded">
+                        <select>
+                            <option id="all" name="category" value="All">
+                                All
+                            </option>
+                            {% for category in items %}
+                            <option id="{{ category }}" name="category" value="{{ category }}">
+                                {{ category }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
             <a href="{{url_for('home')}}">
