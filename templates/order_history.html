@@ -28,9 +28,14 @@
           <br><p style="text-align:left"> <b>Seller:</b> {{items[order][item].seller_username}} </p>
           <br><p style="text-align:left"> <b>Condition:</b> {{items[order][item].condition}} </p>
           <br><p style="text-align:left"> <b>Price:</b> ${{'%0.2f' % items[order][item].price}} </p>
-          <a class="button is-light is-primary is-rounded is-right">
+          <p>{{items[order][item].date_returned}}</p>
+          {% if items[order][item].date_returned %}
+          <a class="button is-light is-primary is-rounded is-right" href="{{url_for('return_item', product_id=items[order][item].product_id, seller_username=items[order][item].seller_username, order_id=orders[order].order_id)}}">
             Return Item
           </a>
+          {% else %}
+          <br><p style="text-align:left"> <b>Item returned on</b> {{items[order][item].date_returned}} </p>
+          {% endif %}
         </div></div>
       </div>
 

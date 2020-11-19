@@ -410,8 +410,6 @@ def profile():
 def edit_buyer():
     form = forms.BuyerEditFormFactory.form(current_user)
 
-
-
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
@@ -575,7 +573,7 @@ def return_item(product_id, seller_username, order_id):
     if item_inorder.date_returned:
         # notify
         flash('This item has already been returned', 'error')
-        return redirect(url_for('order-history'), code=307)
+        return redirect(url_for('order_history'), code=307)
 
     # change date_returned in inorder
     date_returned = datetime.date.today().strftime('%Y-%m-%d')
