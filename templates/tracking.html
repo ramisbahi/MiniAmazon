@@ -8,7 +8,7 @@
         <h1 class="title">Current status: {{status}}</h1>
         {% if status == "Processing" %}
             <progress class="progress is-info" value="33" max="100">33%</progress>
-        {% elif status == "Delivered" %}
+        {% elif status == "Shipped" %}
             <progress class="progress is-link" value="66" max="100">66%</progress>
         {% else %}
             <progress class="progress is-primary" value="99" max="100">99%</progress>
