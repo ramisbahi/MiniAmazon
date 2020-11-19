@@ -10,12 +10,14 @@
     <li>
         <b>Tracking Number:</b> {{orders[order].tracking_num}}</a></p>
     </li>
-    <a class="button is-link is-large" href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">
-      Track Your Package!
-    </a>
+
     <p> <b> Address:</b> {{address}}</p>
     <p> <b> Order Date:</b> {{orders[order].date_ordered}}</p>
     <p> <b> Delivery Date: </b> {{orders[order].date_ordered}}</p>
+    <br>
+    <a class="button is-warning is-large is-inverted" href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">
+      Track Your Package!
+    </a>
     {% for item in range(0, items[order]|length)%}
     <li>
       <hr>
@@ -26,6 +28,9 @@
           <br><p style="text-align:left"> <b>Seller:</b> {{items[order][item].seller_username}} </p>
           <br><p style="text-align:left"> <b>Condition:</b> {{items[order][item].condition}} </p>
           <br><p style="text-align:left"> <b>Price:</b> ${{'%0.2f' % items[order][item].price}} </p>
+          <a class="button is-light is-primary is-rounded is-right">
+            Return Item
+          </a>
         </div></div>
       </div>
 
