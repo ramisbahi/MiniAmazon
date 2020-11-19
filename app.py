@@ -429,20 +429,13 @@ def profile():
 @app.route('/edit-buyer', methods=['GET', 'POST'])
 @login_required
 def edit_buyer():
+
     form = forms.BuyerEditFormFactory.form(current_user)
 
     if form.validate_on_submit():
-        try:
-            form.errors.pop('database', None)
-            buyer = db.session.query(models.Buyers.username == current_user.username).one()
-            buyer.bio = form.bio.data
-            buyer.name = form.name.data
-            buyer.address = form.address.data
-            db.session.commit()
-            return redirect(url_for('profile'))
-        except BaseException as e:
-            form.errors['database'] = str(e)
-            return render_template('edit-buyer.html', buyer=current_user, form=form)
+        form.errors.pop('database', None)
+        models.Buyers.edit(current_user.username, form.bio.data, form.name.data, form.address.data)
+        return redirect(url_for('profile'))
     return render_template('edit-buyer.html', buyer=current_user, form=form)
 
 # seller profiles, based on drinker profiles
