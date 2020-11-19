@@ -1,53 +1,70 @@
 {% extends 'base.html' %}
 {% block heading %}{% endblock %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                    <span>{{ message }}</span>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <h2>All Reviews for {{item.item_name}}</h2>
-
-    <ul>
-        {% for review in reviews %}
-            <li>{{review.item_rating}} stars</li>
-            <li>Comment: {{review.comments}}</li>
-            <li>By: {{review.buyer_username}}</li>
-            <br />
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         {% endfor %}
-    </ul>
-    <hr/>
-    <p>{{reviews|length}} review{{reviews|length|pluralize}}
-        found in the database for an average rating of {{avg_rating}}.</p>
+    {% endif %}
+{% endwith %}
 
-    <h4>Add rating: </h4>
-    <form action="{{url_for('review', product_id=item.product_id)}}" method="POST">
-        {{form.csrf_token}}
-        <p>
-            Rating: {{form.item_rating}}
-            {% if form.item_rating.errors %}
-                <ul>{% for error in form.item_rating.errors %}<li>{{error}}</li>{% endfor %}</ul>
-            {% endif %}
-        </p>
-        <p>
-            Comment: {{form.comments}}
-            {% if form.comments.errors %}
-                <ul>{% for error in form.comments.errors %}<li>{{error}}</li>{% endfor %}</ul>
-            {% endif %}
-        </p>
-        <hr/>
-        <input type="reset" value="Reset"/>
-        <input type="submit" value="Submit"/>
-        {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
-    </form>
-    {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+<div class="columns is-centered">
+    <div class="column is-white is-8">
+        <h3 class="title">All Reviews for {{item.item_name}}</h3>
+        <div class="box">
+            <p class="subtitle is-5">{{reviews|length}} review{{reviews|length|pluralize}}
+                found...</p>
+            <p class="subtitle is-4">Average rating of {{avg_rating}}</p>
+            <hr/>
+                {% for review in reviews %}
+                    <div class="columns">
+                        <div class="column is-one-third">
+                            <span class="icon is-large" style="margin:5px;">
+                                <i class="fas fa-user-circle fa-3x"></i>
+                            </span>
+                            <p>By: <em>{{review.buyer_username}}</em></p>
+                        </div>
+                        <div class="column is-two-thirds">
+                            <p class="subtitle is-5">Rating: <strong>{{review.item_rating}} / 5</strong></p>
+                            <p>Comment: {{review.comments}}</p>
+                        </div>
+                        <br/>
+                    </div>
+                    <hr/>
+                {% endfor %}
+
+            <h4 class="title is-5">Add rating: </h4>
+            <form action="{{url_for('review', product_id=item.product_id)}}" method="POST">
+                {{form.csrf_token}}
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-info" type="integer" name="item_rating" placeholder="Rating" value="5">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-info" name="comments" placeholder="Comments">
+                    </div>
+                </div>
+
+                <hr/>
+                <input class="button is-light is-medium" type="reset" value="Reset" style="margin-right:10px;"/>
+                <input class="button is-primary is-medium" type="submit" value="Submit" style="margin-left:10px;"/>
+                {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+            </form>
+            {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+
 
 {% endblock %}
