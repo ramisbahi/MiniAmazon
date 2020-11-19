@@ -250,18 +250,33 @@ def transaction_success():
 def order_history():
     items = []
     orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == current_user.username).all()
+    order_totals = []
+    inorders = []
     for order in orders:
         currItems = []
-        itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).all()
+        itemPrices = []
+        orderQuantities = []
+        itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).all() #inorders
         for item in itemList:
             itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
             currItems.append(itemInfo)
+
+            itemPrices.append(itemInfo.price)
+            orderQuantities.append(item.order_quantity)
+
+        inorders.append(itemList)
         items.append(currItems)
+        order_totals.append(dot(itemPrices, orderQuantities))
+
     orders.reverse()
     items.reverse()
+    inorders.reverse()
+    order_totals.reverse()
+
+    print("inorders", inorders)
     address = db.session.query(models.Buyers).filter(models.Buyers.username == current_user.username).one()
 
-    return render_template('order_history.html', items=items, orders=orders, address=address.address)
+    return render_template('order_history.html', items=items, inorders=inorders, orders=orders, address=address.address, order_totals=order_totals)
 
 @app.route('/sales-history', methods=['GET', 'POST'])
 @login_required
@@ -586,7 +601,7 @@ def return_item(product_id, seller_username, order_id):
     db.session.commit()
 
 
-    return redirect(url_for('order-history'), code=307)
+    return redirect(url_for('order_history'), code=307)
 
 
 @app.route('/search', methods=['GET'])
