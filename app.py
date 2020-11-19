@@ -12,6 +12,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from itsdangerous import URLSafeTimedSerializer
 import traceback
 import datetime
+from datetime import timedelta
 import random
 import string
 import urllib.request
@@ -250,18 +251,38 @@ def transaction_success():
 def order_history():
     items = []
     orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == current_user.username).all()
+    order_totals = []
+    inorders = []
+    delivery_dates = []
+
     for order in orders:
         currItems = []
-        itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).all()
+        itemPrices = []
+        orderQuantities = []
+        delivery_dates.append(order.date_ordered + timedelta(days=3))
+
+        itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).all() #inorders
         for item in itemList:
             itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
             currItems.append(itemInfo)
+
+            itemPrices.append(itemInfo.price)
+            orderQuantities.append(item.order_quantity)
+
+        inorders.append(itemList)
         items.append(currItems)
+        order_totals.append(dot(itemPrices, orderQuantities))
+
     orders.reverse()
     items.reverse()
+    inorders.reverse()
+    order_totals.reverse()
+    delivery_dates.reverse()
+
+    print("inorders", inorders)
     address = db.session.query(models.Buyers).filter(models.Buyers.username == current_user.username).one()
 
-    return render_template('order_history.html', items=items, orders=orders, address=address.address)
+    return render_template('order_history.html', items=items, inorders=inorders, orders=orders, address=address.address, order_totals=order_totals, delivery_dates=delivery_dates)
 
 @app.route('/sales-history', methods=['GET', 'POST'])
 @login_required
@@ -409,8 +430,6 @@ def profile():
 @login_required
 def edit_buyer():
     form = forms.BuyerEditFormFactory.form(current_user)
-
-
 
     if form.validate_on_submit():
         try:
@@ -575,7 +594,7 @@ def return_item(product_id, seller_username, order_id):
     if item_inorder.date_returned:
         # notify
         flash('This item has already been returned', 'error')
-        return redirect(url_for('order-history'), code=307)
+        return redirect(url_for('order_history'), code=307)
 
     # change date_returned in inorder
     date_returned = datetime.date.today().strftime('%Y-%m-%d')
@@ -588,7 +607,7 @@ def return_item(product_id, seller_username, order_id):
     db.session.commit()
 
 
-    return redirect(url_for('order-history'), code=307)
+    return redirect(url_for('order_history'), code=307)
 
 
 @app.route('/search', methods=['GET'])
