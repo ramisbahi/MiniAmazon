@@ -28,14 +28,9 @@
                 <div class="control">
                     <div class="select is-primary is-rounded">
                         <select>
-                            <option id="all" name="category" value="All">
-                                All
+                            <option id="all" name="category" value="{{ items[0].category }}">
+                                {{ items[0].category }}
                             </option>
-                            {% for category in categories %}
-                            <option id="{{ category }}" name="category" value="{{ category }}">
-                                {{ category }}
-                            </option>
-                            {% endfor %}
                         </select>
                     </div>
                 </div>
