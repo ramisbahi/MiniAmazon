@@ -12,6 +12,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from itsdangerous import URLSafeTimedSerializer
 import traceback
 import datetime
+from datetime import timedelta
 import random
 import string
 import urllib.request
@@ -252,10 +253,14 @@ def order_history():
     orders = db.session.query(models.Orders).filter(models.Orders.buyer_username == current_user.username).all()
     order_totals = []
     inorders = []
+    delivery_dates = []
+
     for order in orders:
         currItems = []
         itemPrices = []
         orderQuantities = []
+        delivery_dates.append(order.date_ordered + timedelta(days=3))
+
         itemList = db.session.query(models.inorder).filter(models.inorder.order_id == order.order_id).all() #inorders
         for item in itemList:
             itemInfo = db.session.query(models.Items).filter(models.Items.product_id == item.product_id).filter(models.Items.seller_username==item.seller_username).one()
@@ -272,11 +277,12 @@ def order_history():
     items.reverse()
     inorders.reverse()
     order_totals.reverse()
+    delivery_dates.reverse()
 
     print("inorders", inorders)
     address = db.session.query(models.Buyers).filter(models.Buyers.username == current_user.username).one()
 
-    return render_template('order_history.html', items=items, inorders=inorders, orders=orders, address=address.address, order_totals=order_totals)
+    return render_template('order_history.html', items=items, inorders=inorders, orders=orders, address=address.address, order_totals=order_totals, delivery_dates=delivery_dates)
 
 @app.route('/sales-history', methods=['GET', 'POST'])
 @login_required

@@ -16,7 +16,7 @@
 
     <p> <b> Address:</b> {{address}}</p>
     <p> <b> Order Date:</b> {{orders[order].date_ordered}}</p>
-    <p> <b> Delivery Date: </b> {{orders[order].date_ordered}}</p>
+    <p> <b> Delivery Date: </b> {{delivery_dates[order]}}</p>
     <br>
     <a class="button is-warning is-large is-inverted" href="{{url_for('tracking', tracking_num=orders[order].tracking_num)}}">
       Track Your Package!
