@@ -3,7 +3,24 @@
 {% block content %}
 
 
+<div class="columns is-centered">
+    <div class="column is-8">
+        <h1 class="title">Current status: {{status}}</h1>
+        {% if status == "Processing" %}
+            <progress class="progress is-info" value="33" max="100">33%</progress>
+        {% elif status == "Delivered" %}
+            <progress class="progress is-link" value="66" max="100">66%</progress>
+        {% else %}
+            <progress class="progress is-primary" value="99" max="100">99%</progress>
+        {% endif %}
+        <div class="box">
+            <h1> <b>Order ID:</b> {{order.order_id}} </h1>
+            <p><b>Tracking Number:</b> {{order.tracking_num}}</a></p>
+            <p> <b> Order Date:</b> {{order.date_ordered}}</p>
+            <br>
+        </div>
+    </div>
+</div>
 
-<h1 class="title">Current status: {{status}}</h1>
 
 {% endblock %}
