@@ -1,29 +1,114 @@
 {% extends 'base.html' %}
 {% block heading %}Seller Information: {{seller.username}}{% endblock %}
 {% block content %}
-<p>Seller: {{seller.name}}</p>
-{% if rating is number %}
-<p>Rating: {{'%0.2f' % rating}}</p>
-{% else %}
-<p>Seller has no ratings</p>
-{% endif %}
-<p>Address: {{seller.address}}</p>
-<p>Bio: {{seller.bio}}</p>
-<br></br>
-<br></br>
-<h2>
-    <strong>Items Selling:</strong>
-</h2>
-<br></br>
-<ul>
-    {% for item in items%}
-      <p>Item: <a href="{{url_for('item', product_id=item.product_id)}}">{{item.item_name}}</a></p>
-      <p>Price: ${{'%0.2f' % item.price}}</p>
-      <p>Description: {{item.description}}</p>
-      <p>Seller: {{item.seller_username}}</p>
-      <p>Category: {{item.category}}</p>
-      <p>Condition: {{item.condition}}</p>
-      <br></br>
-    {% endfor %}
-</ul>
+
+<div class="columns is-centered">
+    <div class="column is-white is-8">
+        <h3 class="title">{{seller.username}}'s Page</h3>
+        <div class="box">
+            <div class="columns is-centered">
+                <div class="column is-one-third">
+                    <span class="icon is-large" style="margin:5px;">
+                        <i class="fas fa-user-circle fa-3x"></i>
+                    </span>
+                    <br>
+                    <span class="tag is-primary is-large" style="width:150px;margin:5px;">
+                        <strong>Name:</strong>
+                    </span>
+                    <br>
+                    <span class="tag is-primary is-large" style="width:150px;margin:5px;">
+                        <strong>Address:</strong>
+                    </span>
+                    <br>
+                    <span class="tag is-primary is-large" style="width:150px;margin:5px;">
+                        <strong>Rating:</strong>
+                    </span>
+                    <br>
+                    <span class="tag is-primary is-large" style="width:150px;margin:5px;">
+                        <strong>Bio:</strong>
+                    </span>
+                    <br>
+                </div>
+                <div class="column is-two-thirds">
+                    <span class="tag is-white is-large" style="height:48px;width:450px;margin:5px;">
+                        <p><em>User info</em></p>
+                    </span>
+                    <span class="tag is-light is-large" style="width:450px;margin:5px;">
+                        <p>{{seller.name}}</p>
+                    </span>
+                    <span class="tag is-light is-large" style="width:450px;margin:5px;">
+                        <p>{{seller.address}}</p>
+                    </span>
+                    <span class="tag is-light is-large" style="width:450px;margin:5px;">
+                        {% if rating is number %}
+                        <p>{{'%0.2f' % rating}}</p>
+                        {% else %}
+                        <p>Seller has no ratings</p>
+                        {% endif %}
+                    </span>
+                    <span class="tag is-light is-large margin-top" style="width:450px;height:150px;margin:5px;">
+                        <p>{{seller.bio}}</p>
+                    </span>
+                    </hr>
+                </div>
+            </div>
+        </div>
+        <br>
+        <h3 class="title">Items Selling</h3>
+        <div class="box">
+            {% for item in items %}
+
+            <div class="columns">
+                <div class="column is-one-sixth">
+                    <figure class="image is-128x128">
+                        <img src="{{item.image}}" style="margin:12px;">
+                    </figure>
+                </div>
+                <div class="column is-one-half">
+                    <h5 class="title is-5">
+                        <a href="{{url_for('item', product_id=item.product_id)}}">
+                            <span class="tag is-light is-large">
+                                {{item.item_name}}
+                            </span>
+                        </a>
+                    </h5>
+                    <p>Category: <strong>{{item.category}}</strong></p>
+                    <p>Description: <em>{{item.description}}</em></p>
+                    <p>
+                        Condition:
+                        <span class="tag is-light is-medium">
+                            {{item.condition}}
+                        </span>
+                    </p>
+                </div>
+                <div class="column is-one-third">
+                    <h6 class="subtile is-6">
+                        Price:
+                        <span class="tag is-light">
+                            ${{item.price}}
+                        </span>
+                    </h6>
+                    <a href="/add_cart/product_id={{item.product_id}}&seller_username={{item.seller_username}}">
+                        <button class="button is-primary is-inverted" style="width:200px;margin-top:10px;">
+                            <span class="icon">
+                                <i class="fas fa-cart-plus is-pulled-left" style="margin-right:60px;"></i>
+                            </span>
+                            Add to Cart
+                        </button>
+                    </a>
+                    <a href="/add_wishlist/product_id={{item.product_id}}&seller_username={{item.seller_username}}">
+                        <button class="button is-success is-inverted" style="width:200px;margin-top:5px;">
+                            <span class="icon">
+                                <i class="fas fa-heart is-pulled-left" style="margin-right:30px;"></i>
+                            </span>
+                            Add to Wishlist
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <hr/>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}

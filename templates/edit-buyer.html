@@ -13,7 +13,8 @@
             </div>
             {% endif %}
             {% endwith %}
-            <form action="{{url_for('edit_buyer')}}" method="POST">
+            <form action="{{url_for('edit_buyer', username = buyer.username)}}" method="POST">
+                {{form.csrf_token}}
                 <div class="field">
                     <div class="control">
                         <input class="input is-info is-medium" type="text" name="username" placeholder="Username" value="{{buyer.username}}" autofocus="" required>
@@ -46,6 +47,7 @@
                         <input class="button is-large is-fullwidth is-primary" type="submit" value="Submit" style="width:150px;margin-left:10px;"/>
                     </div>
                 </div>
+                {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
             </form>
         </div>
     </div>
