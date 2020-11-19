@@ -97,6 +97,7 @@ def add_wishlist(product_id, seller_username):
     # not in wishlist already
     db.session.execute('INSERT INTO inwishlist VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
+    db.session.close()
     return redirect(url_for('wishlist'), code=307)
 
 # decreases quantity by 1 for item in wishlist
@@ -107,6 +108,7 @@ def subtract_quantity_wishlist(product_id, seller_username):
     if currQuantity >= 2:
         db.session.execute('UPDATE inwishlist SET wishlist_quantity = wishlist_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
+        db.session.close()
         return redirect(url_for('wishlist'), code=307)
     else: # delete item if only 1
         return redirect(url_for('delete_wishlist', product_id=product_id, seller_username=seller_username))
@@ -116,6 +118,7 @@ def subtract_quantity_wishlist(product_id, seller_username):
 def add_quantity_wishlist(product_id, seller_username):
     db.session.execute('UPDATE inwishlist SET wishlist_quantity = wishlist_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
+    db.session.close()
     return redirect(url_for('wishlist'), code=307)
 
 # deletes item from wishlist
@@ -123,6 +126,7 @@ def add_quantity_wishlist(product_id, seller_username):
 def delete_wishlist(product_id, seller_username):
     db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
+    db.session.close()
     return redirect(url_for('wishlist'), code=307)
 
 # returns wishlist for user
@@ -150,6 +154,7 @@ def wishlist_to_cart(product_id, seller_username):
     db.session.execute('DELETE FROM inwishlist WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
+    db.session.close()
     return redirect(url_for('wishlist'), code=307)
 
 # adds item to cart
@@ -161,6 +166,7 @@ def add_cart(product_id, seller_username):
     else: # not in cart already
         db.session.execute('INSERT INTO incart VALUES(:product_id, :seller_username, :buyer_username, 1)', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
+        db.session.close()
         return redirect(url_for('cart'), code=307)
 
 # decreases quantity by 1 for item in cart
@@ -171,6 +177,7 @@ def subtract_quantity_cart(product_id, seller_username):
     if currQuantity >= 2:
         db.session.execute('UPDATE incart SET cart_quantity = cart_quantity - 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
         db.session.commit()
+        db.session.close()
         return redirect(url_for('cart', username=current_user.username), code=307)
     else: # delete item if only 1
         return redirect(url_for('delete_cart', product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
@@ -180,6 +187,7 @@ def subtract_quantity_cart(product_id, seller_username):
 def add_quantity_cart(product_id, seller_username):
     db.session.execute('UPDATE incart SET cart_quantity = cart_quantity + 1 WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
+    db.session.close()
     return redirect(url_for('cart'), code=307)
 
 # deletes item from cart
@@ -187,6 +195,7 @@ def add_quantity_cart(product_id, seller_username):
 def delete_cart(product_id, seller_username):
     db.session.execute('DELETE FROM incart WHERE product_id = :product_id AND seller_username = :seller_username AND buyer_username =  :buyer_username', dict(product_id=product_id, seller_username=seller_username, buyer_username=current_user.username))
     db.session.commit()
+    db.session.close()
     return redirect(url_for('cart'), code=307)
 
 # returns cart for user
@@ -231,7 +240,8 @@ def transaction_success():
     cart_items = db.session.query(models.incart)\
         .filter(models.incart.buyer_username == current_user.username).all()
     date = str(datetime.date.today())
-    db.session.execute('INSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=current_user.username, date_bought=date))
+
+    db.session.execute('CREATE TRIGGER checkBuyer BEFORE INSERT ON OINSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=current_user.username, date_bought=date))
     for cart_item in cart_items:
         orderID = db.session.query(func.max(models.Orders.order_id)).scalar()
         # decrement number of items below
@@ -243,6 +253,7 @@ def transaction_success():
         db.session.execute('INSERT INTO inorder VALUES(:product_id, :seller_username, :order_id, :order_quantity)', dict(product_id=cart_item.product_id, seller_username=cart_item.seller_username, order_id=orderID, order_quantity=cart_item.cart_quantity))
     db.session.execute(('DELETE FROM incart WHERE buyer_username = :buyer_username'), dict(buyer_username=current_user.username))
     db.session.commit()
+    db.session.close()
     return redirect(url_for('home'), code=307)
 
 
@@ -300,6 +311,7 @@ def delete_item(product_id):
     user = current_user.username
     db.session.execute('UPDATE items SET quantity = 0 WHERE items.seller_username = :user and items.product_id = :product_id', dict(user=user, product_id=product_id))
     db.session.commit()
+    db.session.close()
 
     flash('Item deleted successfully')
     return redirect(url_for('sales_history'))
@@ -308,32 +320,28 @@ def delete_item(product_id):
 @app.route('/edit-item/<product_id>', methods=['GET', 'POST'])
 @login_required
 def edit_item(product_id):
-    try:
-        item = db.session.query(models.Items).filter(models.Items.product_id == product_id).filter(models.Items.seller_username == current_user.username).one()
-        form = forms.ItemEditFormFactory.form(item)
-        if form.validate_on_submit():
-            form.errors.pop('database', None)
+    item = db.session.query(models.Items).filter(models.Items.product_id == product_id).one()
+    form = forms.ItemEditFormFactory.form(item)
+    if form.validate_on_submit():
+        form.errors.pop('database', None)
 
-            if (request.files['image']):
-                image = request.files['image']
-                apiUrl = 'https://api.imgur.com/3/image'
-                b64_image = base64.standard_b64encode(image.read())
-                params = {'image' : b64_image}
-                headers = {'Authorization' : 'Client-ID 12aa250c79dba8d'}
-                #client_id = '12aa250c79dba8d'
-                #client_secret = '0e132c4d82850eda1d2a172903f5a85bcea10a0b'
-                response = requests.post(apiUrl, headers=headers, data=params)
-                result = json.loads(response.text)
-                edit_posting = models.Items()
-                edit_posting.image = result['data']['link']
-                models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, edit_posting.image, form.description.data)
-            else:
-                models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, item.image, form.description.data)
+        if (request.files['image']):
+            image = request.files['image']
+            apiUrl = 'https://api.imgur.com/3/image'
+            b64_image = base64.standard_b64encode(image.read())
+            params = {'image' : b64_image}
+            headers = {'Authorization' : 'Client-ID 12aa250c79dba8d'}
+            #client_id = '12aa250c79dba8d'
+            #client_secret = '0e132c4d82850eda1d2a172903f5a85bcea10a0b'
+            response = requests.post(apiUrl, headers=headers, data=params)
+            result = json.loads(response.text)
+            edit_posting = models.Items()
+            edit_posting.image = result['data']['link']
+            models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, edit_posting.image, form.description.data)
+        else:
+            models.Items.edit(product_id, current_user.username, form.category.data, form.condition.data, form.item_name.data, form.price.data, form.quantity.data, item.image, form.description.data)
 
-            flash('Item been modified successfully')
-            return redirect(url_for('sales_history'))
-    except:
-        flash('You are not selling this item or this is not a valid item.')
+        flash('Item been modified successfully')
         return redirect(url_for('sales_history'))
     return render_template('edit-item.html', item=item, form=form)
 
@@ -370,6 +378,7 @@ def post_item():
         db.session.execute('UPDATE buyers SET is_seller=\'1\' WHERE username=:username', dict(username=current_user.username))
 
         db.session.commit()
+        db.session.close()
 
         current_user.is_seller = '1'
 
@@ -410,6 +419,7 @@ def review(product_id):
 
             db.session.add(new_review)
             db.session.commit()
+            db.session.close()
 
             return redirect(url_for('review', product_id=product_id))
         except BaseException as e:
@@ -433,13 +443,21 @@ def profile():
 @app.route('/edit-buyer', methods=['GET', 'POST'])
 @login_required
 def edit_buyer():
-
     form = forms.BuyerEditFormFactory.form(current_user)
 
     if form.validate_on_submit():
-        form.errors.pop('database', None)
-        models.Buyers.edit(current_user.username, form.bio.data, form.name.data, form.address.data)
-        return redirect(url_for('profile'))
+        try:
+            form.errors.pop('database', None)
+            buyer = db.session.query(models.Buyers.username == current_user.username).one()
+            buyer.bio = form.bio.data
+            buyer.name = form.name.data
+            buyer.address = form.address.data
+            db.session.commit()
+            db.session.close()
+            return redirect(url_for('profile'))
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('edit-buyer.html', buyer=current_user, form=form)
     return render_template('edit-buyer.html', buyer=current_user, form=form)
 
 # seller profiles, based on drinker profiles
@@ -527,6 +545,7 @@ def reset_post(token):
     print("BUYER", buyer)
     db.session.execute('UPDATE buyers SET password=:password WHERE username=:username', dict(password=hashedPassword, username=username))
     db.session.commit()
+    db.session.close()
     flash('Your password has been updated!', 'success')
     return redirect(url_for('login'))
 
@@ -564,6 +583,7 @@ def register_post():
     new_buyer = models.Buyers(username=username, is_seller='0', bio=bio, name=name, password=generate_password_hash(password, method='sha256'), address=address, maiden=generate_password_hash(maiden, method='sha256'))
     db.session.add(new_buyer)
     db.session.commit()
+    db.session.close()
     return redirect(url_for('login'))
 
 
@@ -602,15 +622,16 @@ def return_item(product_id, seller_username, order_id):
     db.session.execute('UPDATE Items SET quantity=quantity+:additional_quantity WHERE product_id=:product_id AND seller_username=:seller_username', dict(additional_quantity=additional_quantity, product_id=product_id, seller_username=seller_username))
 
     db.session.commit()
+    db.session.close()
 
 
     return redirect(url_for('order_history'), code=307)
 
 
 @app.route('/search', methods=['GET'])
-def search_page(items=None, category='All'):
+def search_page(items=None):
     items = [] if items is None else items
-    return render_template('search-items.html', items=items, form=forms.SearchFormFactory.form(), category=category)
+    return render_template('search-items.html', items=items, form=forms.SearchFormFactory.form(), categories=categories)
 
 
 @app.route('/search', methods=['POST'])
@@ -632,9 +653,7 @@ def search():
             form.errors['database'] = str(e)
             return redirect(url_for('home'))
 
-    category = form.category.data if form.category.data is not None else 'All'
-
-    return render_template('search-items.html', items=items, form=form, category=category)
+    return render_template('search-items.html', items=items, form=form, categories=categories)
 
 
 
