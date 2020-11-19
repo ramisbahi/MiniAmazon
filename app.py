@@ -240,7 +240,7 @@ def transaction_success():
     cart_items = db.session.query(models.incart)\
         .filter(models.incart.buyer_username == current_user.username).all()
     date = str(datetime.date.today())
-
+    db.session.execute('INSERT INTO Orders VALUES(DEFAULT, :buyer_username, DEFAULT, :date_bought)', dict(buyer_username=current_user.username, date_bought=date))
     for cart_item in cart_items:
         orderID = db.session.query(func.max(models.Orders.order_id)).scalar()
         # decrement number of items below
@@ -252,8 +252,8 @@ def transaction_success():
         db.session.execute('INSERT INTO inorder VALUES(:product_id, :seller_username, :order_id, :order_quantity)', dict(product_id=cart_item.product_id, seller_username=cart_item.seller_username, order_id=orderID, order_quantity=cart_item.cart_quantity))
     db.session.execute(('DELETE FROM incart WHERE buyer_username = :buyer_username'), dict(buyer_username=current_user.username))
     db.session.commit()
-    db.session.close()
     return redirect(url_for('home'), code=307)
+
 
 
 @app.route('/order-history', methods=['GET', 'POST'])
