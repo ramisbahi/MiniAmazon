@@ -366,6 +366,7 @@ def post_item():
         new_posting.description = form.description.data
 
         image = request.files['image']
+        print(image)
         apiUrl = 'https://api.imgur.com/3/image'
         b64_image = base64.standard_b64encode(image.read())
         params = {'image' : b64_image}
